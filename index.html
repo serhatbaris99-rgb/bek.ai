@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#080b16" />
+  <meta name="description" content="BEK AI — yapay zekâ destekli sohbet, üretim ve proje çalışma alanı." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="./icon.svg" />
+  <link rel="apple-touch-icon" href="./icon.svg" />
   <title>BEK AI</title>
 
   <!-- Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
@@ -757,6 +762,16 @@
     <h1>BEK AI Canlı Çalışma Alanı</h1>
     <p>Yukarıya projenizi yazın, canlı önizleme anında burada çalışsın.</p>
   </div>
+  <script>
+    // BEK AI PWA: register the offline app shell when hosted over HTTPS.
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch((error) => {
+          console.warn('BEK AI service worker registration failed:', error);
+        });
+      });
+    }
+  </script>
 </body>
 </html></textarea>
         </div>
