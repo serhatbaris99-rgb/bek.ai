@@ -1,14 +1,11 @@
 {
-  "id": "./",
   "name": "BEK AI",
   "short_name": "BEK AI",
-  "description": "BEK AI — yapay zekâ çalışma alanı",
-  "lang": "tr",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
-  "background_color": "#080b16",
-  "theme_color": "#080b16",
+  "background_color": "#090b13",
+  "theme_color": "#090b13",
+  "lang": "tr",
   "icons": [
     {
       "src": "./icon.svg",
