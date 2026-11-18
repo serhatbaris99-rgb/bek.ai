@@ -5,7 +5,7 @@
 <meta name="theme-color" content="#090b13"><meta name="description" content="BEK AI — sohbet, görsel üretimi ve yazılım çalışma alanı.">
 <link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon.svg">
 <title>BEK AI</title><link rel="stylesheet" href="./styles.css">
-<script src="https://js.puter.com/v2/"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="./config.js"></script><script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 </head>
 <body>
 <div class="app-shell">
@@ -21,7 +21,7 @@
   <div class="sidebar-bottom"><div class="status-dot"></div><span>BEK AI çalışma alanı</span><small>Önizleme sürümü</small></div>
 </aside>
 <main class="main">
-<header class="topbar"><button class="mobile-menu" id="mobileMenu">☰</button><div><strong id="pageTitle">Yapay zekâ sohbeti</strong><span id="pageSubtitle">Fikirlerini konuş, öğren ve üret.</span></div><div class="top-actions"><span class="cloud-pill">☁ Bulut çalışma alanı</span><button class="profile" id="connectBtn">AI'ya bağlan</button></div></header>
+<header class="topbar"><button class="mobile-menu" id="mobileMenu">☰</button><div><strong id="pageTitle">Yapay zekâ sohbeti</strong><span id="pageSubtitle">Fikirlerini konuş, öğren ve üret.</span></div><div class="top-actions"><span class="cloud-pill">☁ Bulut çalışma alanı</span><button class="profile" id="connectBtn">Hesabım / Giriş</button></div></header>
 <section class="view active" id="view-chat">
   <div class="chat-wrap"><div class="welcome" id="welcome"><div class="orb">✦</div><p class="eyebrow">MERHABA, BEN BEK AI</p><h1>Bugün ne <em>üretmek</em> istiyorsun?</h1><p class="muted">Sor, öğren, fikir geliştir veya bir projeye başla.</p><div class="suggestions"><button data-prompt="Bana modern bir portfolyo sitesi için plan hazırla.">Bir website tasarla ↗</button><button data-prompt="JavaScript öğrenmek için başlangıç planı hazırla.">Kod öğren ↗</button><button data-prompt="Bir işletme için yaratıcı marka fikirleri üret.">Fikir üret ↗</button></div></div><div class="messages" id="messages"></div></div>
   <div class="composer"><textarea id="chatInput" rows="1" placeholder="BEK AI'ya bir şey sor..."></textarea><div class="composer-foot"><span>Yanıt kalitesi kullanılan ücretsiz AI servisinin erişimine bağlıdır.</span><button class="send" id="sendChat">↑</button></div></div>
