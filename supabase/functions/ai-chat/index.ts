@@ -52,8 +52,7 @@ Deno.serve(async (req) => {
   const quotaRow = Array.isArray(quota) ? quota[0] : quota;
   if (!quotaRow?.allowed) return json({ error: "Günlük ücretsiz 20 mesaj kotan doldu.", quota: quotaRow }, 429);
 
-  const requestedModel = typeof body.model === "string" ? body.model : "openrouter/auto";
-  const safeModel = requestedModel === "openrouter/auto" ? requestedModel : "openrouter/auto";
+  const safeModel = "openrouter/free";
   try {
     const upstream = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
