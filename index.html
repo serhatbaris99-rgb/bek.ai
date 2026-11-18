@@ -663,11 +663,16 @@
             <i data-lucide="clapperboard" class="w-5 h-5 text-violet-400"></i>
             <span>Video Stüdyosu</span>
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Sahne kareleri (Storyboard) ve sinematik video senaryosu oluşturun.</p>
+          <p class="text-xs text-slate-400 mt-0.5">Fotoğraflarınızdan indirilebilir hareketli video hazırlayın; ayrıca AI ile sahne planı oluşturun.</p>
         </div>
 
         <div class="glass-panel p-4 rounded-2xl space-y-3">
           <textarea id="vid-studio-prompt" rows="3" placeholder="Video sahnesini anlatın..." class="w-full bg-bek-bg border border-purple-500/25 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none"></textarea>
+          <div class="rounded-xl border border-white/10 p-3 space-y-2">
+            <label for="vid-studio-photo" class="block text-xs font-semibold text-slate-200">Video için fotoğraf(lar) yükle</label>
+            <input id="vid-studio-photo" type="file" accept="image/*" multiple class="block w-full text-xs text-slate-300 file:mr-3 file:rounded-lg file:border-0 file:bg-purple-600 file:px-3 file:py-2 file:text-white" />
+            <p class="text-[11px] text-slate-500">Fotoğraflar tarayıcında işlenir. Bu ücretsiz mod, gerçek üretken AI video değil; fotoğraflara kamera hareketi vererek indirilebilir WebM video oluşturur.</p>
+          </div>
           <div class="flex items-center justify-between">
             <select id="vid-studio-dur" class="bg-bek-bg border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200">
               <option value="15 saniye">15 Saniye (Kısa Video)</option>
@@ -675,7 +680,7 @@
               <option value="60 saniye">60 Saniye (Tam Sahne)</option>
             </select>
             <button onclick="runVideoStudio()" id="vid-studio-btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-semibold">
-              Sahne & Kare Üret
+              Senaryo & Önizleme
             </button>
           </div>
         </div>
@@ -1582,12 +1587,84 @@
     }
 
     // -------------------------------------------------------------------------
-    // 7. VIDEO STUDIO (KEYFRAME VISUAL + TIMED SCENE SCRIPT)
+    // 7. VIDEO STUDIO (AI STORYBOARD + LOCAL PHOTO MOTION EXPORT)
     // -------------------------------------------------------------------------
+    async function createPhotoMotionVideo(files, durationSeconds, output) {
+      if (!files.length) throw new Error('Önce en az bir fotoğraf yükleyin.');
+      if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) {
+        throw new Error('Bu tarayıcı video kaydını desteklemiyor. Güncel Chrome kullanın.');
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = 1280;
+      canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+      const loaded = await Promise.all(files.slice(0, 12).map(file => new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => resolve({ img, url });
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(file.name + ' yüklenemedi.')); };
+        img.src = url;
+      })));
+      const stream = canvas.captureStream(30);
+      const mimeType = ['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'].find(t => MediaRecorder.isTypeSupported(t));
+      if (!mimeType) throw new Error('Bu tarayıcı desteklenen WebM video kodlayıcısı sunmuyor.');
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks = [];
+      recorder.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      const finished = new Promise((resolve, reject) => {
+        recorder.onstop = () => resolve(new Blob(chunks, { type: mimeType }));
+        recorder.onerror = () => reject(new Error('Video kaydı başarısız oldu.'));
+      });
+      const drawFrame = (elapsed) => {
+        const photoDuration = durationSeconds / loaded.length;
+        const index = Math.min(loaded.length - 1, Math.floor(elapsed / photoDuration));
+        const local = (elapsed - index * photoDuration) / photoDuration;
+        const { img } = loaded[index];
+        const base = Math.max(canvas.width / img.width, canvas.height / img.height);
+        const zoom = 1.04 + 0.12 * local;
+        const w = img.width * base * zoom;
+        const h = img.height * base * zoom;
+        const drift = (local - 0.5) * 34;
+        ctx.fillStyle = '#080b16';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(img,(canvas.width-w)/2+drift,(canvas.height-h)/2,w,h);
+      };
+      output.textContent = 'Video oluşturuluyor… Bu işlem sekme açıkken sürer.';
+      recorder.start(250);
+      const started = performance.now();
+      await new Promise(resolve => {
+        const tick = () => {
+          const elapsed = Math.min(durationSeconds, (performance.now() - started) / 1000);
+          drawFrame(elapsed);
+          if (elapsed >= durationSeconds) resolve();
+          else requestAnimationFrame(tick);
+        };
+        tick();
+      });
+      recorder.stop();
+      const blob = await finished;
+      stream.getTracks().forEach(track => track.stop());
+      loaded.forEach(item => URL.revokeObjectURL(item.url));
+      const url = URL.createObjectURL(blob);
+      output.innerHTML = '';
+      const video = document.createElement('video');
+      video.controls = true;
+      video.src = url;
+      video.className = 'w-full rounded-xl border border-purple-500/30';
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'bek-ai-video.webm';
+      link.textContent = 'Videoyu indir (WebM)';
+      link.className = 'inline-block mt-3 px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold';
+      output.append(video, link);
+      incrementUsage('videos');
+    }
+
     async function runVideoStudio() {
       const prompt = document.getElementById('vid-studio-prompt').value.trim();
       const dur = document.getElementById('vid-studio-dur').value;
-      if (!prompt) {
+      const photoFiles = Array.from(document.getElementById('vid-studio-photo')?.files || []);
+      if (!prompt && !photoFiles.length) {
         showToast('Lütfen video fikrinizi yazın.');
         return;
       }
@@ -1597,24 +1674,41 @@
       btn.disabled = true;
       out.innerHTML = `<p class="text-xs text-purple-300 animate-pulse">Video sahnesi ve anahtar kare hazırlanıyor...</p>`;
 
-      const [script, engFrame] = await Promise.all([
-        executeSilentAI(`Konu: "${prompt}", Süre: ${dur}. Saniye saniye video çekim senaryosu, kamera hareketleri ve seslendirme metni oluştur.`),
-        executeSilentAI(`Convert to 15-word English cinematic frame description: "${prompt}"`, { customSystem: 'Output ONLY English visual keywords.' })
-      ]);
-
-      const frameUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(engFrame.replace(/["']/g, ''))}?width=1280&height=720&model=flux&nologo=true`;
-      incrementUsage('videos');
-
-      out.innerHTML = `
-        <div class="space-y-4">
-          <div class="rounded-xl overflow-hidden border border-purple-500/30 relative">
-            <img src="${frameUrl}" alt="Sahne Önizleme" class="w-full max-h-64 object-cover" />
-            <span class="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-black/75 text-[11px] text-sky-300">Anahtar Sahne Karesi • ${dur}</span>
-          </div>
-          <div class="markdown-body">${marked.parse(script)}</div>
-        </div>
-      `;
-      btn.disabled = false;
+      try {
+        let script = '';
+        if (prompt) {
+          script = await executeSilentAI(`Konu: "${prompt}", Süre: ${dur}. Saniye saniye çekim senaryosu, kamera hareketleri ve seslendirme metni oluştur. Bunun gerçek video değil, senaryo olduğunu belirtme; yalnızca senaryoyu yaz.`);
+        }
+        const seconds = parseInt(dur, 10) || 15;
+        if (photoFiles.length) {
+          const preview = document.createElement('div');
+          preview.className = 'space-y-3';
+          out.replaceChildren(preview);
+          const note = document.createElement('p');
+          note.className = 'text-xs text-slate-300';
+          note.textContent = 'Fotoğraflardan gerçek oynatılabilir WebM dosyası hazırlanıyor.';
+          preview.appendChild(note);
+          await createPhotoMotionVideo(photoFiles, seconds, preview);
+        }
+        if (script) {
+          const section = document.createElement('div');
+          section.className = 'markdown-body mt-4';
+          section.innerHTML = marked.parse(script);
+          out.appendChild(section);
+        }
+        if (!photoFiles.length && script) {
+          out.innerHTML = '<div class="markdown-body"></div>';
+          out.querySelector('.markdown-body').innerHTML = marked.parse(script);
+          const label = document.createElement('p');
+          label.className = 'text-xs text-amber-300 mt-3';
+          label.textContent = 'Bu çıktı video dosyası değil, AI tarafından hazırlanmış çekim senaryosudur. Video oluşturmak için fotoğraf yükleyin.';
+          out.appendChild(label);
+        }
+      } catch (error) {
+        out.textContent = error.message || 'Video oluşturulamadı.';
+      } finally {
+        btn.disabled = false;
+      }
     }
 
     // -------------------------------------------------------------------------
