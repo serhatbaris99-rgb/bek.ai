@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BEK AI</title>
+
+  <!-- Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Marked.js for Markdown Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- JSZip for Exporting Projects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- Puter.js Keyless AI SDK -->
+  <script src="https://js.puter.com/v2/"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Plus Jakarta Sans', 'sans-serif'],
+            display: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            bek: {
+              bg: '#07080f',
+              sidebar: '#090b14',
+              card: '#0e1120',
+              cardHover: '#14182e',
+              purple: '#9333ea',
+              violet: '#7c3aed',
+              cyan: '#38bdf8',
+              blue: '#3b82f6',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      background-color: #07080f;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.25); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(56, 189, 248, 0.45); }
+
+    /* Cosmic Hero Backdrop matching reference screenshot */
+    .cosmic-hero {
+      position: relative;
+      background:
+        radial-gradient(ellipse 65% 55% at 50% 42%, rgba(139, 92, 246, 0.28) 0%, rgba(56, 189, 248, 0.12) 42%, transparent 75%),
+        radial-gradient(circle at 82% 28%, rgba(56, 189, 248, 0.24) 0%, rgba(30, 58, 138, 0.16) 25%, transparent 52%),
+        radial-gradient(circle at 18% 35%, rgba(168, 85, 247, 0.26) 0%, transparent 48%),
+        linear-gradient(180deg, #0b0d1c 0%, #07080f 100%);
+      overflow: hidden;
+    }
+
+    /* Planet & Horizon Ring Effect inside Hero */
+    .cosmic-planet {
+      position: absolute;
+      right: 4%;
+      top: -12%;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 35%, rgba(56, 189, 248, 0.22), rgba(15, 23, 42, 0.92) 68%, #07080f 100%);
+      box-shadow:
+        inset -20px -20px 50px rgba(0, 0, 0, 0.9),
+        0 0 60px rgba(56, 189, 248, 0.22),
+        0 0 110px rgba(139, 92, 246, 0.18);
+      pointer-events: none;
+      opacity: 0.78;
+    }
+
+    .cosmic-horizon {
+      position: absolute;
+      bottom: -85px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 140%;
+      height: 150px;
+      border-radius: 50%;
+      border-top: 1.5px solid rgba(139, 92, 246, 0.45);
+      box-shadow: 0 -15px 45px rgba(139, 92, 246, 0.22);
+      pointer-events: none;
+    }
+
+    /* Glass Panels & Neon Borders */
+    .glass-panel {
+      background: rgba(14, 17, 32, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    .prompt-glow-box {
+      background: rgba(17, 20, 38, 0.88);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(168, 85, 247, 0.42);
+      box-shadow:
+        0 0 32px rgba(139, 92, 246, 0.22),
+        inset 0 0 18px rgba(56, 189, 248, 0.06);
+      transition: all 0.25s ease;
+    }
+
+    .prompt-glow-box:focus-within {
+      border-color: rgba(192, 132, 252, 0.85);
+      box-shadow:
+        0 0 42px rgba(168, 85, 247, 0.36),
+        0 0 18px rgba(56, 189, 248, 0.22);
+    }
+
+    /* Engine Card Hover Glow */
+    .engine-card {
+      background: linear-gradient(145deg, rgba(16, 20, 38, 0.92), rgba(10, 13, 25, 0.96));
+      border: 1px solid rgba(139, 92, 246, 0.22);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .engine-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(56, 189, 248, 0.65);
+      box-shadow: 0 8px 26px rgba(139, 92, 246, 0.22), 0 0 14px rgba(56, 189, 248, 0.18);
+      background: linear-gradient(145deg, rgba(22, 28, 54, 0.96), rgba(13, 17, 34, 0.98));
+    }
+
+    .engine-card.selected {
+      border-color: #38bdf8;
+      box-shadow: 0 0 22px rgba(56, 189, 248, 0.32);
+    }
+
+    /* Sidebar Active Item Pill */
+    .sidebar-item-active {
+      background: linear-gradient(90deg, rgba(124, 58, 237, 0.32) 0%, rgba(139, 92, 246, 0.12) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.45);
+      color: #ffffff;
+      box-shadow: 0 0 18px rgba(124, 58, 237, 0.22);
+    }
+
+    /* Metallic Hero Title */
+    .metallic-title {
+      background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 58%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 4px 24px rgba(139, 92, 246, 0.35));
+    }
+
+    /* Markdown Styling inside Chat */
+    .markdown-body {
+      line-height: 1.7;
+      font-size: 0.93rem;
+      color: #e2e8f0;
+    }
+    .markdown-body p { margin-bottom: 0.8rem; }
+    .markdown-body p:last-child { margin-bottom: 0; }
+    .markdown-body h1, .markdown-body h2, .markdown-body h3 {
+      color: #ffffff;
+      font-weight: 700;
+      margin: 1.1rem 0 0.45rem;
+    }
+    .markdown-body h1 { font-size: 1.25rem; }
+    .markdown-body h2 { font-size: 1.12rem; }
+    .markdown-body h3 { font-size: 1rem; color: #7dd3fc; }
+    .markdown-body ul, .markdown-body ol { padding-left: 1.35rem; margin-bottom: 0.8rem; }
+    .markdown-body ul { list-style-type: disc; }
+    .markdown-body ol { list-style-type: decimal; }
+    .markdown-body li { margin-bottom: 0.3rem; }
+    .markdown-body strong { color: #ffffff; font-weight: 600; }
+    .markdown-body code:not(pre code) {
+      background: rgba(56, 189, 248, 0.14);
+      color: #7dd3fc;
+      padding: 0.12rem 0.38rem;
+      border-radius: 0.35rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.84em;
+    }
+    .markdown-body pre {
+      background: #05060c;
+      border: 1px solid rgba(139, 92, 246, 0.28);
+      border-radius: 0.8rem;
+      margin: 0.9rem 0;
+      overflow: hidden;
+    }
+    .markdown-body pre code {
+      display: block;
+      padding: 0.95rem;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #e2e8f0;
+    }
+
+    /* Thinking Dots */
+    .dot-pulse { animation: pulseAnim 1.4s infinite ease-in-out both; }
+    .dot-pulse:nth-child(1) { animation-delay: -0.32s; }
+    .dot-pulse:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes pulseAnim {
+      0%, 80%, 100% { transform: scale(0.45); opacity: 0.35; }
+      40% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="h-screen flex overflow-hidden select-none sm:select-auto">
+
+  <!-- Toast Container -->
+  <div id="toast-box" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-xs pointer-events-none"></div>
+
+  <!-- Mobile Drawer Overlay -->
+  <div id="mobile-overlay" onclick="toggleLeftSidebar(false)" class="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 hidden lg:hidden"></div>
+
+  <!-- ==================== 1. LEFT NAVIGATION SIDEBAR ==================== -->
+  <aside id="left-sidebar" class="fixed lg:static inset-y-0 left-0 z-50 w-64 bg-bek-sidebar border-r border-white/[0.06] flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-200 shrink-0">
+    
+    <!-- Top Brand Header (ONLY "BEK AI" + Sharp Geometric Blue/Purple 'B' Logo) -->
+    <div class="px-4 pt-4 pb-3 flex items-center justify-between shrink-0">
+      <button onclick="goHome()" class="flex items-center gap-2.5 group focus:outline-none">
+        <!-- Sharp Geometric Neon 'B' SVG Logo -->
+        <svg viewBox="0 0 48 48" class="w-8 h-8 shrink-0 drop-shadow-[0_0_12px_rgba(56,189,248,0.55)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bekSharpGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#38BDF8" />
+              <stop offset="50%" stop-color="#6366F1" />
+              <stop offset="100%" stop-color="#A855F7" />
+            </linearGradient>
+          </defs>
+          <path d="M12 7H29.5L36.5 13.5V19.5L31.5 23.5L38 28.5V35.5L30.5 41H12L17.5 34.5H28.5L31 32V29L27.5 26.5H16.5L19.5 21H27.5L30 18.8V15.8L27.5 13.5H15.5L12 7Z" fill="url(#bekSharpGrad)" />
+          <path d="M10 14L15 24L10 34" stroke="#38BDF8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="font-display font-extrabold text-xl tracking-wide text-white">BEK AI</span>
+      </button>
+
+      <button onclick="toggleLeftSidebar()" class="w-7 h-7 rounded-full bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.08] flex items-center justify-center text-slate-400 hover:text-white transition-colors" title="Menüyü Daralt">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+      </button>
+    </div>
+
+    <!-- 16 Navigation Items -->
+    <nav class="flex-1 overflow-y-auto px-3 py-1 space-y-0.5 text-[13px]">
+      <button data-nav="home" onclick="navigateTo('home')" class="nav-btn sidebar-item-active w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="home" class="w-4 h-4 text-purple-400 shrink-0"></i>
+        <span>Ana Sayfa</span>
+      </button>
+
+      <button data-nav="newchat" onclick="startFreshChat()" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="plus" class="w-4 h-4 text-slate-400 shrink-0"></i>
+        <span>Yeni Sohbet</span>
+      </button>
+
+      <button data-nav="history" onclick="navigateTo('history')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="clock" class="w-4 h-4 text-slate-400 shrink-0"></i>
+        <span>Sohbet Geçmişi</span>
+      </button>
+
+      <button data-nav="engines" onclick="navigateTo('engines')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="layers" class="w-4 h-4 text-purple-400 shrink-0"></i>
+        <span>AI Motorları</span>
+      </button>
+
+      <button data-nav="image" onclick="navigateTo('image')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="image" class="w-4 h-4 text-sky-400 shrink-0"></i>
+        <span>Görsel Stüdyosu</span>
+      </button>
+
+      <button data-nav="video" onclick="navigateTo('video')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="clapperboard" class="w-4 h-4 text-violet-400 shrink-0"></i>
+        <span>Video Stüdyosu</span>
+      </button>
+
+      <button data-nav="voice" onclick="navigateTo('voice')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="audio-waveform" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+        <span>Ses Stüdyosu</span>
+      </button>
+
+      <button data-nav="code" onclick="navigateTo('code')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="code-2" class="w-4 h-4 text-sky-400 shrink-0"></i>
+        <span>Kod Geliştirme</span>
+      </button>
+
+      <button data-nav="website" onclick="openBuilderPreset('website')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="layout" class="w-4 h-4 text-indigo-400 shrink-0"></i>
+        <span>Web Sitesi Oluşturucu</span>
+      </button>
+
+      <button data-nav="appbuilder" onclick="openBuilderPreset('app')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="smartphone" class="w-4 h-4 text-blue-400 shrink-0"></i>
+        <span>Uygulama Oluşturucu</span>
+      </button>
+
+      <button data-nav="prompt" onclick="navigateTo('prompt')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="sparkles" class="w-4 h-4 text-fuchsia-400 shrink-0"></i>
+        <span>Prompt Stüdyosu</span>
+      </button>
+
+      <button data-nav="research" onclick="navigateTo('research')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="search" class="w-4 h-4 text-sky-400 shrink-0"></i>
+        <span>Araştırma Merkezi</span>
+      </button>
+
+      <button data-nav="files" onclick="navigateTo('files')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="folder" class="w-4 h-4 text-slate-400 shrink-0"></i>
+        <span>Dosya Yöneticisi</span>
+      </button>
+
+      <button data-nav="memory" onclick="navigateTo('memory')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="brain" class="w-4 h-4 text-pink-400 shrink-0"></i>
+        <span>Kişisel Hafıza</span>
+      </button>
+
+      <button data-nav="automation" onclick="navigateTo('automation')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="git-branch" class="w-4 h-4 text-amber-400 shrink-0"></i>
+        <span>Otomasyonlar</span>
+      </button>
+
+      <button data-nav="settings" onclick="navigateTo('settings')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-xl font-medium text-slate-300 hover:text-white hover:bg-white/[0.04] transition-all">
+        <i data-lucide="settings" class="w-4 h-4 text-slate-400 shrink-0"></i>
+        <span>Ayarlar</span>
+      </button>
+    </nav>
+
+    <!-- Bottom Profile Card: Barış Kömbe • BEK AI Pro -->
+    <div class="p-3 shrink-0">
+      <div onclick="navigateTo('settings')" class="p-2.5 rounded-2xl bg-gradient-to-r from-[#131629] to-[#191533] border border-purple-500/25 hover:border-purple-400/50 flex items-center justify-between cursor-pointer transition-all">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-sky-500 via-indigo-500 to-purple-600 p-[1.5px] shrink-0">
+            <div class="w-full h-full rounded-full bg-[#0b0e1c] flex items-center justify-center text-xs font-bold text-white">
+              BK
+            </div>
+          </div>
+          <div class="truncate">
+            <div class="text-xs font-semibold text-white truncate">Barış Kömbe</div>
+            <div class="text-[11px] font-medium text-purple-400">BEK AI Pro</div>
+          </div>
+        </div>
+        <div class="w-7 h-7 rounded-full bg-purple-500/20 border border-purple-400/30 flex items-center justify-center text-purple-300 shrink-0">
+          <i data-lucide="crown" class="w-3.5 h-3.5"></i>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== 2. CENTER WORKSPACE ==================== -->
+  <div class="flex-1 flex flex-col min-w-0 h-screen bg-bek-bg relative overflow-hidden">
+
+    <!-- Mobile Top Bar -->
+    <header class="lg:hidden h-13 px-4 flex items-center justify-between border-b border-white/[0.07] bg-bek-sidebar/90 backdrop-blur-md shrink-0 z-30">
+      <button onclick="toggleLeftSidebar(true)" class="p-2 rounded-lg text-slate-300 hover:bg-white/5">
+        <i data-lucide="menu" class="w-5 h-5"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <svg viewBox="0 0 48 48" class="w-6 h-6" fill="none">
+          <path d="M12 7H29.5L36.5 13.5V19.5L31.5 23.5L38 28.5V35.5L30.5 41H12L17.5 34.5H28.5L31 32V29L27.5 26.5H16.5L19.5 21H27.5L30 18.8V15.8L27.5 13.5H15.5L12 7Z" fill="#38BDF8" />
+        </svg>
+        <span class="font-display font-extrabold text-base tracking-wide text-white">BEK AI</span>
+      </div>
+      <button onclick="startFreshChat()" class="p-2 rounded-lg text-purple-400 hover:bg-white/5">
+        <i data-lucide="plus" class="w-5 h-5"></i>
+      </button>
+    </header>
+
+    <!-- ==================== VIEW: HOME DASHBOARD (EXACT SCREENSHOT LAYOUT) ==================== -->
+    <main id="view-home" class="view-pane flex-1 overflow-y-auto">
+      
+      <!-- Cosmic Futuristic Hero Section -->
+      <div class="cosmic-hero px-4 sm:px-8 pt-8 pb-7 border-b border-white/[0.05]">
+        <div class="cosmic-planet"></div>
+        <div class="cosmic-horizon"></div>
+
+        <!-- Subtle Cybernetic Silhouette Accent on Left -->
+        <svg viewBox="0 0 260 260" class="hidden md:block absolute left-4 top-2 w-60 h-60 opacity-30 pointer-events-none" fill="none">
+          <circle cx="110" cy="115" r="78" stroke="url(#cyberRing)" stroke-width="1.5" stroke-dasharray="6 6" />
+          <circle cx="110" cy="115" r="54" stroke="#A855F7" stroke-width="2" />
+          <circle cx="110" cy="115" r="22" fill="rgba(168,85,247,0.25)" stroke="#38BDF8" stroke-width="2" />
+          <path d="M35 235C45 185 80 165 120 165C160 165 190 188 205 235" stroke="url(#cyberRing)" stroke-width="2.5" />
+          <defs>
+            <linearGradient id="cyberRing" x1="30" y1="40" x2="210" y2="230" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#A855F7" />
+              <stop offset="100%" stop-color="#38BDF8" />
+            </linearGradient>
+          </defs>
+        </svg>
+
+        <div class="relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center">
+          <!-- Center Glowing Sharp 'B' Emblem -->
+          <div class="mb-2">
+            <svg viewBox="0 0 64 64" class="w-12 h-12 sm:w-14 sm:h-14 drop-shadow-[0_0_22px_rgba(139,92,246,0.75)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="heroBGrad" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#38BDF8" />
+                  <stop offset="50%" stop-color="#818CF8" />
+                  <stop offset="100%" stop-color="#C084FC" />
+                </linearGradient>
+              </defs>
+              <path d="M16 9H39L48 17.5V25.5L41.5 31L50 37.5V47L40 55H16L23 46H37.5L41 42.8V38.8L36.5 35.5H21.5L25.5 28H36.5L40 25V21L36.5 18H20.5L16 9Z" fill="url(#heroBGrad)" />
+              <path d="M13 18L20 32L13 46" stroke="#38BDF8" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </div>
+
+          <!-- ONLY "BEK AI" Title -->
+          <h1 class="font-display font-extrabold text-4xl sm:text-5xl md:text-[54px] tracking-[0.06em] metallic-title leading-tight">
+            BEK AI
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="mt-2.5 text-sm sm:text-base text-purple-200/85 font-medium max-w-xl">
+            Yapay zekâ ile üret, geliştir, tasarla ve hayata geçir.
+          </p>
+
+          <!-- 4 Feature Pills -->
+          <div class="mt-5 flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+            <button onclick="navigateTo('engines')" class="px-3.5 py-1.5 rounded-full bg-[#13172d]/90 border border-purple-500/35 text-xs font-medium text-slate-200 flex items-center gap-1.5 hover:border-purple-400 transition-colors">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-purple-400"></i>
+              <span>20 Uzmanlık Motoru</span>
+            </button>
+            <button onclick="navigateTo('image')" class="px-3.5 py-1.5 rounded-full bg-[#13172d]/90 border border-indigo-500/35 text-xs font-medium text-slate-200 flex items-center gap-1.5 hover:border-indigo-400 transition-colors">
+              <i data-lucide="box" class="w-3.5 h-3.5 text-indigo-400"></i>
+              <span>Üretim Araçları</span>
+            </button>
+            <button onclick="navigateTo('code')" class="px-3.5 py-1.5 rounded-full bg-[#13172d]/90 border border-sky-500/35 text-xs font-medium text-slate-200 flex items-center gap-1.5 hover:border-sky-400 transition-colors">
+              <i data-lucide="layers" class="w-3.5 h-3.5 text-sky-400"></i>
+              <span>Kod & Geliştirme</span>
+            </button>
+            <button onclick="startFreshChat()" class="px-3.5 py-1.5 rounded-full bg-[#13172d]/90 border border-fuchsia-500/35 text-xs font-medium text-slate-200 flex items-center gap-1.5 hover:border-fuchsia-400 transition-colors">
+              <i data-lucide="infinity" class="w-3.5 h-3.5 text-fuchsia-400"></i>
+              <span>Sınırsız Yaratıcılık</span>
+            </button>
+          </div>
+
+          <!-- Central Glowing Prompt Input Bar -->
+          <div class="w-full max-w-3xl mt-6">
+            <div id="home-file-chip" class="hidden mb-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/35 text-xs text-purple-200">
+              <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+              <span id="home-file-name">dosya.txt</span>
+              <button type="button" onclick="clearAttachedFile()" class="hover:text-rose-400 ml-1">✕</button>
+            </div>
+
+            <form onsubmit="handleHeroPromptSubmit(event)" class="prompt-glow-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5">
+              <i data-lucide="sparkles" class="w-5 h-5 text-purple-400 shrink-0"></i>
+
+              <input
+                id="hero-prompt-input"
+                type="text"
+                placeholder="BEK AI'ye mesajını yaz..."
+                class="flex-1 bg-transparent text-sm sm:text-[15px] text-white placeholder-slate-400 focus:outline-none min-w-0"
+              />
+
+              <div class="flex items-center gap-1.5 shrink-0">
+                <!-- File Attachment -->
+                <label class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] cursor-pointer transition-colors" title="Dosya Ekle">
+                  <i data-lucide="paperclip" class="w-4 h-4"></i>
+                  <input type="file" class="hidden" onchange="handleFileAttachment(event)">
+                </label>
+
+                <!-- Voice Input -->
+                <button type="button" onclick="startVoiceInput('hero-prompt-input')" class="p-2 rounded-xl text-slate-400 hover:text-cyan-300 hover:bg-white/[0.06] transition-colors" title="Sesli Komut">
+                  <i data-lucide="mic" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Image Studio Quick Switch -->
+                <button type="button" onclick="navigateTo('image')" class="p-2 rounded-xl text-slate-400 hover:text-purple-300 hover:bg-white/[0.06] transition-colors" title="Görsel Üret">
+                  <i data-lucide="image" class="w-4 h-4"></i>
+                </button>
+
+                <!-- Glowing Purple Send Button -->
+                <button type="submit" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400 text-white flex items-center justify-center shadow-[0_0_18px_rgba(147,51,234,0.55)] transition-all">
+                  <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI Uzmanlık Motorları Section (4x5 Grid of 20 Engines) -->
+      <div class="max-w-5xl mx-auto px-4 sm:px-8 py-6 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <div class="flex items-start gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/15 border border-purple-500/30 flex items-center justify-center text-purple-400 mt-0.5 shrink-0">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-white">AI Uzmanlık Motorları</h2>
+              <p class="text-xs text-slate-400">İhtiyacına uygun 20 profesyonel yapay zekâ motoruyla çalış.</p>
+            </div>
+          </div>
+
+          <button onclick="navigateTo('engines')" class="px-3.5 py-1.5 rounded-xl bg-[#12162b] hover:bg-[#1a203d] border border-purple-500/30 text-xs font-medium text-slate-200 flex items-center gap-1.5 transition-all">
+            <span>Tümünü Gör (20)</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-purple-400"></i>
+          </button>
+        </div>
+
+        <!-- 20 Engine Cards Grid (4 columns on desktop, 2 on tablet, 1 on mobile) -->
+        <div id="home-engines-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <!-- Dynamically populated with exact 20 cards -->
+        </div>
+      </div>
+    </main>
+
+    <!-- ==================== VIEW: ACTIVE STREAMING AI CHAT ==================== -->
+    <section id="view-chat" class="view-pane hidden flex-1 flex flex-col min-h-0">
+      <!-- Chat Top Bar -->
+      <div class="h-13 px-4 sm:px-6 border-b border-white/[0.07] bg-bek-sidebar/60 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <button onclick="navigateTo('home')" class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" title="Ana Sayfa">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          </button>
+          <span id="chat-active-engine-badge" class="px-2.5 py-1 rounded-lg bg-purple-500/15 border border-purple-500/30 text-xs font-semibold text-purple-300 truncate">
+            Genel AI Asistanı
+          </span>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <button onclick="toggleAutoSpeak()" id="tts-toggle-btn" class="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5" title="Sesli Yanıt">
+            <i data-lucide="volume-x" class="w-4 h-4"></i>
+          </button>
+          <button onclick="startFreshChat()" class="px-3 py-1.5 rounded-lg bg-purple-600/25 hover:bg-purple-600/35 border border-purple-500/35 text-xs font-medium text-purple-200">
+            + Yeni Sohbet
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Feed -->
+      <div id="chat-scroll-area" class="flex-1 overflow-y-auto px-4 sm:px-8 py-6">
+        <div id="chat-messages-container" class="max-w-3xl mx-auto space-y-5">
+          <!-- Rendered messages -->
+        </div>
+      </div>
+
+      <!-- Chat Bottom Composer -->
+      <div class="px-4 sm:px-8 pb-4 pt-2 bg-gradient-to-t from-bek-bg via-bek-bg to-transparent shrink-0">
+        <div class="max-w-3xl mx-auto">
+          <div id="chat-file-chip" class="hidden mb-2 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/35 text-xs text-purple-200">
+            <i data-lucide="paperclip" class="w-3.5 h-3.5"></i>
+            <span id="chat-file-name">dosya.txt</span>
+            <button type="button" onclick="clearAttachedFile()" class="hover:text-rose-400 ml-1">✕</button>
+          </div>
+
+          <form onsubmit="handleChatSubmit(event)" class="prompt-glow-box rounded-2xl px-3.5 py-2 flex items-end gap-2">
+            <label class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/[0.06] cursor-pointer shrink-0">
+              <i data-lucide="paperclip" class="w-4 h-4"></i>
+              <input type="file" class="hidden" onchange="handleFileAttachment(event)">
+            </label>
+
+            <textarea
+              id="chat-textarea"
+              rows="1"
+              placeholder="BEK AI'ye mesajını yaz..."
+              oninput="autoGrowInput(this)"
+              onkeydown="handleTextareaEnter(event)"
+              class="flex-1 bg-transparent text-sm text-white placeholder-slate-400 focus:outline-none py-1.5 resize-none max-h-36"
+            ></textarea>
+
+            <button type="button" onclick="startVoiceInput('chat-textarea')" class="p-2 rounded-xl text-slate-400 hover:text-cyan-300 hover:bg-white/[0.06] shrink-0">
+              <i data-lucide="mic" class="w-4 h-4"></i>
+            </button>
+
+            <button type="submit" class="w-9 h-9 rounded-xl bg-gradient-to-tr from-violet-600 to-purple-500 hover:from-violet-500 hover:to-purple-400 text-white flex items-center justify-center shadow-[0_0_16px_rgba(147,51,234,0.5)] shrink-0">
+              <i data-lucide="send" class="w-4 h-4"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: ALL 20 ENGINES DIRECTORY ==================== -->
+    <section id="view-engines" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-5xl mx-auto space-y-5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold text-white">20 AI Uzmanlık Motoru</h2>
+            <p class="text-xs text-slate-400 mt-0.5">Herhangi bir motoru seçerek özel sistem talimatıyla doğrudan çalışmaya başlayın.</p>
+          </div>
+          <button onclick="navigateTo('home')" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-slate-300">Ana Sayfaya Dön</button>
+        </div>
+        <div id="all-engines-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: CHAT HISTORY ==================== -->
+    <section id="view-history" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-white">Sohbet Geçmişi</h2>
+          <button onclick="startFreshChat()" class="px-3.5 py-2 rounded-xl bg-purple-600 text-xs font-semibold text-white">+ Yeni Sohbet</button>
+        </div>
+        <div id="history-list-container" class="space-y-2.5"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: IMAGE STUDIO ==================== -->
+    <section id="view-image" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-4xl mx-auto space-y-5">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="image" class="w-5 h-5 text-sky-400"></i>
+            <span>Görsel Stüdyosu</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Metinden yüksek çözünürlüklü görsel oluşturun ve indirin.</p>
+        </div>
+
+        <div class="glass-panel p-4 rounded-2xl space-y-3">
+          <textarea id="img-studio-prompt" rows="3" placeholder="Örn: Fütüristik İstanbul silüeti üzerinde mor ve mavi neon ışıklar, sinematik 8k..." class="w-full bg-bek-bg border border-purple-500/25 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:border-purple-400 focus:outline-none"></textarea>
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div class="flex gap-2">
+              <select id="img-studio-size" class="bg-bek-bg border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200">
+                <option value="1024x1024">1:1 Kare (1024x1024)</option>
+                <option value="1280x720">16:9 Geniş (1280x720)</option>
+                <option value="720x1280">9:16 Dikey (720x1280)</option>
+              </select>
+              <select id="img-studio-style" class="bg-bek-bg border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200">
+                <option value="cinematic photorealistic 8k">Sinematik Gerçekçi</option>
+                <option value="cyberpunk neon digital art">Siberpunk Neon</option>
+                <option value="3d octane render ultra detailed">3D Render</option>
+              </select>
+            </div>
+            <button onclick="runImageStudio()" id="img-studio-btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white text-xs font-semibold shadow-lg">
+              Görsel Üret
+            </button>
+          </div>
+        </div>
+
+        <div id="img-studio-canvas" class="glass-panel rounded-2xl p-6 min-h-[320px] flex flex-col items-center justify-center text-center">
+          <i data-lucide="sparkles" class="w-9 h-9 text-purple-400/50 mb-2"></i>
+          <p class="text-xs text-slate-400">Oluşturulan görseller burada görüntülenir.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: VIDEO STUDIO ==================== -->
+    <section id="view-video" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-4xl mx-auto space-y-5">
+        <div>
+          <h2 class="text-xl font-bold text-white flex items-center gap-2">
+            <i data-lucide="clapperboard" class="w-5 h-5 text-violet-400"></i>
+            <span>Video Stüdyosu</span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">Sahne kareleri (Storyboard) ve sinematik video senaryosu oluşturun.</p>
+        </div>
+
+        <div class="glass-panel p-4 rounded-2xl space-y-3">
+          <textarea id="vid-studio-prompt" rows="3" placeholder="Video sahnesini anlatın..." class="w-full bg-bek-bg border border-purple-500/25 rounded-xl p-3 text-sm text-white placeholder-slate-500 focus:outline-none"></textarea>
+          <div class="flex items-center justify-between">
+            <select id="vid-studio-dur" class="bg-bek-bg border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200">
+              <option value="15 saniye">15 Saniye (Kısa Video)</option>
+              <option value="30 saniye">30 Saniye (Tanıtım)</option>
+              <option value="60 saniye">60 Saniye (Tam Sahne)</option>
+            </select>
+            <button onclick="runVideoStudio()" id="vid-studio-btn" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-semibold">
+              Sahne & Kare Üret
+            </button>
+          </div>
+        </div>
+
+        <div id="vid-studio-output" class="glass-panel rounded-2xl p-6 min-h-[260px]">
+          <p class="text-xs text-slate-400 text-center py-8">Sahne açıklaması girildiğinde görsel anahtar kare (keyframe) ve saniye bazlı çekim planı oluşturulur.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: VOICE STUDIO ==================== -->
+    <section id="view-voice" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-4xl mx-auto space-y-5">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <i data-lucide="audio-waveform" class="w-5 h-5 text-cyan-400"></i>
+          <span>Ses Stüdyosu</span>
+        </h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="glass-panel p-5 rounded-2xl space-y-3 text-center">
+            <div id="voice-mic-circle" class="w-16 h-16 mx-auto rounded-full bg-cyan-500/15 border border-cyan-400/40 flex items-center justify-center text-cyan-400">
+              <i data-lucide="mic" class="w-7 h-7"></i>
+            </div>
+            <h3 class="text-sm font-bold text-white">Ses Tanıma (Konuşmayı Metne Çevir)</h3>
+            <button onclick="toggleVoiceDictation()" id="voice-rec-btn" class="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-bold text-xs">Mikrofonu Başlat</button>
+            <textarea id="voice-stt-text" rows="4" class="w-full bg-bek-bg border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none" placeholder="Konuşmanız burada metne dönüşür..."></textarea>
+          </div>
+
+          <div class="glass-panel p-5 rounded-2xl space-y-3">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2">
+              <i data-lucide="volume-2" class="w-4 h-4 text-purple-400"></i>
+              <span>Metinden Ses Üretimi</span>
+            </h3>
+            <textarea id="voice-tts-text" rows="5" class="w-full bg-bek-bg border border-white/10 rounded-xl p-3 text-xs text-white focus:outline-none">BEK AI sistemine hoş geldiniz. Tüm yapay zekâ motorları aktif.</textarea>
+            <div class="flex gap-2">
+              <button onclick="speakText(document.getElementById('voice-tts-text').value)" class="flex-1 py-2 rounded-xl bg-purple-600 text-white font-semibold text-xs">Seslendir</button>
+              <button onclick="window.speechSynthesis.cancel()" class="px-4 py-2 rounded-xl bg-white/10 text-slate-300 text-xs">Durdur</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: CODE / WEBSITE / APP BUILDER (LIVE PREVIEW + ZIP) ==================== -->
+    <section id="view-code" class="view-pane hidden flex-1 flex flex-col min-h-0 p-4 sm:p-6 gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <h2 id="builder-title" class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="code-2" class="w-5 h-5 text-sky-400"></i>
+          <span>Kod Geliştirme & Canlı Önizleme</span>
+        </h2>
+        <div class="flex items-center gap-2">
+          <button onclick="copyEditorCode()" class="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-slate-200">Kopyala</button>
+          <button onclick="exportSingleHtml()" class="px-3 py-1.5 rounded-xl bg-sky-500/20 border border-sky-400/30 text-xs text-sky-200">HTML İndir</button>
+          <button onclick="exportProjectZip()" class="px-3 py-1.5 rounded-xl bg-purple-500/25 border border-purple-400/35 text-xs text-purple-200">ZIP İndir</button>
+        </div>
+      </div>
+
+      <div class="prompt-glow-box rounded-2xl p-2 flex items-center gap-2 shrink-0">
+        <input id="builder-prompt-input" type="text" placeholder="Oluşturmak istediğiniz site, uygulama veya kodu yazın..." class="flex-1 bg-transparent px-3 py-1.5 text-xs sm:text-sm text-white focus:outline-none">
+        <button onclick="generateLiveProject()" id="builder-run-btn" class="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-sky-500 text-white text-xs font-semibold shrink-0">
+          Oluştur & Çalıştır
+        </button>
+      </div>
+
+      <div class="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 min-h-0">
+        <div class="glass-panel rounded-2xl flex flex-col overflow-hidden">
+          <div class="px-3.5 py-2 border-b border-white/10 text-[11px] font-mono text-sky-300 flex justify-between">
+            <span>index.html</span>
+            <span>Canlı Kod</span>
+          </div>
+          <textarea id="code-editor-area" oninput="updateLiveSandbox()" spellcheck="false" class="flex-1 w-full bg-[#05060c] text-xs font-mono text-sky-100 p-3.5 focus:outline-none resize-none"><!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { background: #07080f; color: #f8fafc; font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .box { padding: 2rem; border-radius: 1.25rem; background: rgba(139, 92, 246, 0.12); border: 1px solid rgba(168, 85, 247, 0.4); text-align: center; }
+    h1 { color: #38bdf8; margin: 0 0 0.5rem; font-size: 1.4rem; }
+    p { color: #94a3b8; font-size: 0.88rem; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>BEK AI Canlı Çalışma Alanı</h1>
+    <p>Yukarıya projenizi yazın, canlı önizleme anında burada çalışsın.</p>
+  </div>
+</body>
+</html></textarea>
+        </div>
+
+        <div class="glass-panel rounded-2xl flex flex-col overflow-hidden">
+          <div class="px-3.5 py-2 border-b border-white/10 text-[11px] text-emerald-400 flex justify-between">
+            <span>● Canlı Önizleme</span>
+            <button onclick="updateLiveSandbox()" class="text-sky-300 hover:underline">Yenile</button>
+          </div>
+          <iframe id="sandbox-iframe" class="flex-1 w-full bg-white" sandbox="allow-scripts allow-forms allow-modals"></iframe>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: PROMPT STUDIO ==================== -->
+    <section id="view-prompt" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <h2 class="text-xl font-bold text-white">Prompt Stüdyosu</h2>
+        <p class="text-xs text-slate-400">Basit fikrinizi profesyonel yapay zekâ komutuna dönüştürün.</p>
+        <div class="glass-panel p-4 rounded-2xl space-y-3">
+          <textarea id="raw-idea-input" rows="3" placeholder="Kısa fikrinizi yazın..." class="w-full bg-bek-bg border border-white/10 rounded-xl p-3 text-sm text-white focus:outline-none"></textarea>
+          <button onclick="optimizeUserPrompt()" id="opt-prompt-btn" class="px-5 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold">Profesyonel Prompt Oluştur</button>
+        </div>
+        <div id="opt-prompt-result" class="hidden glass-panel p-5 rounded-2xl markdown-body"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: RESEARCH CENTER ==================== -->
+    <section id="view-research" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <h2 class="text-xl font-bold text-white">Araştırma Merkezi</h2>
+        <div class="prompt-glow-box rounded-2xl p-2 flex gap-2">
+          <input id="research-query-input" type="text" placeholder="Derinlemesine araştırmak istediğiniz konuyu yazın..." class="flex-1 bg-transparent px-3 text-sm text-white focus:outline-none">
+          <button onclick="runResearchQuery()" id="research-go-btn" class="px-4 py-2 rounded-xl bg-sky-500 text-slate-950 font-bold text-xs">Araştır</button>
+        </div>
+        <div id="research-output-box" class="glass-panel p-5 rounded-2xl min-h-[220px] markdown-body text-xs text-slate-400">
+          Araştırma sonuçları yapılandırılmış rapor hâlinde burada sunulur.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: FILE MANAGER ==================== -->
+    <section id="view-files" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <h2 class="text-xl font-bold text-white">Dosya Yöneticisi & Analiz</h2>
+        <label class="glass-panel p-8 rounded-2xl border-2 border-dashed border-purple-500/35 flex flex-col items-center justify-center cursor-pointer hover:border-sky-400 transition-colors">
+          <i data-lucide="upload-cloud" class="w-9 h-9 text-purple-400 mb-2"></i>
+          <span class="text-sm font-semibold text-white">Dosya Seçin veya Sürükleyin</span>
+          <span class="text-xs text-slate-400 mt-1">TXT, CSV, JSON, MD, JS, PY, HTML, PNG, JPG</span>
+          <input type="file" class="hidden" onchange="analyzeUploadedFile(event)">
+        </label>
+        <div id="file-analysis-panel" class="hidden glass-panel p-5 rounded-2xl markdown-body"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: PERSONAL MEMORY ==================== -->
+    <section id="view-memory" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-3xl mx-auto space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-xl font-bold text-white">Kişisel Hafıza</h2>
+          <label class="flex items-center gap-2 text-xs text-slate-300">
+            <input type="checkbox" id="memory-enabled-chk" checked onchange="toggleMemoryEnabled(this.checked)" class="accent-purple-500">
+            <span>Aktif</span>
+          </label>
+        </div>
+        <form onsubmit="addMemoryEntry(event)" class="prompt-glow-box rounded-2xl p-2 flex gap-2">
+          <input id="memory-entry-input" type="text" placeholder="Hafızaya eklenecek bilgi..." class="flex-1 bg-transparent px-3 text-sm text-white focus:outline-none">
+          <button type="submit" class="px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold">Ekle</button>
+        </form>
+        <div id="memory-entries-list" class="space-y-2"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: AUTOMATIONS ==================== -->
+    <section id="view-automation" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-4xl mx-auto space-y-4">
+        <h2 class="text-xl font-bold text-white">Otomasyonlar</h2>
+        <form onsubmit="addAutomationTask(event)" class="glass-panel p-4 rounded-2xl grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+          <input id="auto-task-title" type="text" placeholder="Görev Adı" class="sm:col-span-4 bg-bek-bg border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          <input id="auto-task-prompt" type="text" placeholder="Çalıştırılacak AI komutu..." class="sm:col-span-6 bg-bek-bg border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none">
+          <button type="submit" class="sm:col-span-2 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold">Kaydet</button>
+        </form>
+        <div id="automation-cards-grid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW: SETTINGS ==================== -->
+    <section id="view-settings" class="view-pane hidden flex-1 overflow-y-auto p-4 sm:p-8">
+      <div class="max-w-2xl mx-auto space-y-4">
+        <h2 class="text-xl font-bold text-white">Sistem Ayarları</h2>
+        <div class="glass-panel p-5 rounded-2xl space-y-4 text-xs">
+          <div class="flex items-center justify-between py-2 border-b border-white/10">
+            <div>
+              <div class="font-semibold text-white">Otomatik Çoklu Motor Yönlendirme</div>
+              <div class="text-slate-400">Bağlantı yoğunluğunda yedek modellere kesintisiz geçiş yapar.</div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 font-semibold">Aktif</span>
+          </div>
+          <div class="flex items-center justify-between py-2">
+            <div>
+              <div class="font-semibold text-white">Yerel Verileri Sıfırla</div>
+              <div class="text-slate-400">Sohbet geçmişini ve sayaçları sıfırlar.</div>
+            </div>
+            <button onclick="resetAllLocalData()" class="px-3 py-1.5 rounded-xl bg-rose-500/20 text-rose-300 border border-rose-500/30">Sıfırla</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ==================== 3. RIGHT STATUS SIDEBAR (EXACT SCREENSHOT CARDS) ==================== -->
+  <aside class="hidden xl:flex w-72 bg-bek-sidebar border-l border-white/[0.06] p-3.5 flex-col gap-3.5 overflow-y-auto shrink-0">
+    
+    <!-- Card 1: BEK AI Pro -->
+    <div class="p-4 rounded-2xl bg-gradient-to-br from-[#231445] via-[#171230] to-[#0f1122] border border-purple-500/35 shadow-[0_0_24px_rgba(139,92,246,0.18)] flex items-center gap-3 relative overflow-hidden">
+      <div class="w-10 h-10 rounded-full bg-purple-500/25 border border-purple-400/40 flex items-center justify-center text-purple-300 shrink-0 shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+        <i data-lucide="crown" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <div class="text-sm font-bold text-white">BEK AI Pro</div>
+        <div class="text-xs text-purple-200/75">Tüm özellikler aktif</div>
+      </div>
+    </div>
+
+    <!-- Card 2: Aktif AI Motoru -->
+    <div class="glass-panel p-4 rounded-2xl space-y-2.5">
+      <div class="text-xs font-semibold text-slate-300">Aktif AI Motoru</div>
+      <div class="p-2.5 rounded-xl bg-[#0a0d19] border border-white/[0.08] flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-white/[0.05] border border-white/10 flex items-center justify-center text-sky-400 shrink-0">
+          <i data-lucide="cpu" class="w-4 h-4"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <select id="right-model-selector" onchange="onModelSelectionChange(this.value)" class="w-full bg-transparent text-xs font-bold text-white focus:outline-none cursor-pointer">
+            <option value="auto" class="bg-slate-900">GPT-4o Premium</option>
+            <option value="claude" class="bg-slate-900">Claude 3.5 Sonnet</option>
+            <option value="llama" class="bg-slate-900">Llama 3.1 70B</option>
+            <option value="qwen" class="bg-slate-900">Qwen Coder Pro</option>
+          </select>
+          <div class="flex items-center gap-1.5 text-[11px] text-emerald-400 mt-0.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Çevrimiçi</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Sistem Durumu -->
+    <div class="glass-panel p-4 rounded-2xl space-y-3">
+      <div class="text-xs font-semibold text-slate-300">Sistem Durumu</div>
+      <div class="space-y-2.5 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span>AI Servisleri</span>
+          </span>
+          <span class="text-emerald-400 font-medium">Aktif</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span>Görsel Üretim</span>
+          </span>
+          <span class="text-emerald-400 font-medium">Aktif</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span>Video Üretim</span>
+          </span>
+          <span class="text-emerald-400 font-medium">Aktif</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span>Ses Servisleri</span>
+          </span>
+          <span class="text-emerald-400 font-medium">Aktif</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="flex items-center gap-2 text-slate-300">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></span>
+            <span>Dosya Analizi</span>
+          </span>
+          <span class="text-emerald-400 font-medium">Aktif</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Kullanım -->
+    <div class="glass-panel p-4 rounded-2xl space-y-3">
+      <div class="text-xs font-semibold text-slate-300">Kullanım</div>
+      
+      <div class="space-y-1.5">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-slate-400">Aylık Kotan</span>
+          <span id="quota-percent-label" class="font-bold text-white">%32</span>
+        </div>
+        <div class="w-full h-1.5 rounded-full bg-white/[0.08] overflow-hidden">
+          <div id="quota-progress-bar" class="h-full rounded-full bg-gradient-to-r from-purple-500 to-sky-400 transition-all duration-500" style="width: 32%"></div>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-1 text-xs">
+        <div class="flex items-center justify-between text-slate-300">
+          <span class="flex items-center gap-2">
+            <i data-lucide="message-square-check" class="w-3.5 h-3.5 text-purple-400"></i>
+            <span>AI Mesajı</span>
+          </span>
+          <span id="stat-msg-count" class="text-slate-400 font-mono text-[11px]">3.200 / 10.000</span>
+        </div>
+
+        <div class="flex items-center justify-between text-slate-300">
+          <span class="flex items-center gap-2">
+            <i data-lucide="image" class="w-3.5 h-3.5 text-sky-400"></i>
+            <span>Görsel Üretimi</span>
+          </span>
+          <span id="stat-img-count" class="text-slate-400 font-mono text-[11px]">148 / 500</span>
+        </div>
+
+        <div class="flex items-center justify-between text-slate-300">
+          <span class="flex items-center gap-2">
+            <i data-lucide="video" class="w-3.5 h-3.5 text-violet-400"></i>
+            <span>Video Üretimi</span>
+          </span>
+          <span id="stat-vid-count" class="text-slate-400 font-mono text-[11px]">12 / 50</span>
+        </div>
+
+        <div class="flex items-center justify-between text-slate-300">
+          <span class="flex items-center gap-2">
+            <i data-lucide="mic" class="w-3.5 h-3.5 text-cyan-400"></i>
+            <span>Ses Üretimi</span>
+          </span>
+          <span id="stat-aud-count" class="text-slate-400 font-mono text-[11px]">36 / 200</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ==================== JAVASCRIPT: 20 ENGINES + SILENT MULTI-AI ROUTER ==================== -->
+  <script>
+    // -------------------------------------------------------------------------
+    // 1. EXACT 20 AI SPECIALIZATION ENGINES (MATCHING REFERENCE SCREENSHOT)
+    // -------------------------------------------------------------------------
+    const BEK_ENGINES = [
+      { id: 'genel', title: 'Genel AI', sub: 'Asistanı', icon: 'message-square', color: 'text-purple-400', prompt: 'Sen BEK AI Genel Yapay Zekâ Asistanısın. Tüm soruları net, akıcı ve doğal Türkçe ile yanıtla.' },
+      { id: 'mantik', title: 'Mantık &', sub: 'Akıl Yürütme', icon: 'brain', color: 'text-sky-400', prompt: 'Sen BEK AI Mantık ve Akıl Yürütme motorusun. Problemleri adım adım analiz et ve kusursuz çıkarımlar yap.' },
+      { id: 'yazarlik', title: 'Profesyonel', sub: 'Yazarlık', icon: 'pen-tool', color: 'text-fuchsia-400', prompt: 'Sen BEK AI Profesyonel Yazarlık motorusun. Akıcı, etkileyici ve kusursuz Türkçe metinler oluştur.' },
+      { id: 'akademik', title: 'Akademik', sub: 'Yardım', icon: 'graduation-cap', color: 'text-indigo-400', prompt: 'Sen BEK AI Akademik Araştırma motorusun. Bilimsel, kaynak odaklı ve yapılandırılmış açıklamalar sun.' },
+      { id: 'web', title: 'Web', sub: 'Araştırması', icon: 'globe', color: 'text-purple-400', prompt: 'Sen BEK AI Web Araştırması motorusun. Konuları güncel perspektifle özetle ve net maddelerle açıkla.' },
+
+      { id: 'gorsel_uret', title: 'Görsel', sub: 'Üretimi', icon: 'image', color: 'text-sky-400', action: 'image', prompt: 'Görsel üretim motoru.' },
+      { id: 'gorsel_duzen', title: 'Görsel', sub: 'Düzenleme', icon: 'sliders', color: 'text-violet-400', action: 'image', prompt: 'Görsel düzenleme ve iyileştirme motoru.' },
+      { id: 'gorsel_analiz', title: 'Görsel', sub: 'Analizi', icon: 'scan', color: 'text-cyan-400', prompt: 'Sen BEK AI Görsel Analiz motorusun. Yüklenen veya tarif edilen görselleri detaylı analiz et.' },
+      { id: 'video_uret', title: 'Video', sub: 'Üretimi', icon: 'play-circle', color: 'text-purple-400', action: 'video', prompt: 'Video üretim motoru.' },
+      { id: 'video_duzen', title: 'Video', sub: 'Düzenleme', icon: 'film', color: 'text-sky-400', action: 'video', prompt: 'Video kurgu ve düzenleme motoru.' },
+
+      { id: 'yazilim', title: 'Yazılım', sub: 'Geliştirme', icon: 'code-2', color: 'text-purple-400', prompt: 'Sen BEK AI Kıdemli Yazılım Geliştirme motorusun. Temiz, modüler ve doğrudan çalışır kod üret.' },
+      { id: 'debug', title: 'Kod', sub: 'Hata Ayıklama', icon: 'bug', color: 'text-cyan-400', prompt: 'Sen BEK AI Kod Hata Ayıklama motorusun. Kodlardaki hataları tespit et, nedenini açıkla ve düzeltilmiş halini ver.' },
+      { id: 'website', title: 'Web Sitesi', sub: 'Geliştirme', icon: 'layout', color: 'text-indigo-400', action: 'website', prompt: 'Web sitesi geliştirme motoru.' },
+      { id: 'mobil', title: 'Mobil Uygulama', sub: 'Geliştirme', icon: 'smartphone', color: 'text-sky-400', action: 'app', prompt: 'Mobil uygulama geliştirme motoru.' },
+      { id: 'prompt_eng', title: 'Prompt', sub: 'Mühendisliği', icon: 'sparkles', color: 'text-fuchsia-400', prompt: 'Sen BEK AI Prompt Mühendisliği motorusun. Kullanıcı fikirlerini en yüksek kaliteli AI komutlarına dönüştür.' },
+
+      { id: 'ses_tanima', title: 'Ses', sub: 'Tanıma', icon: 'audio-waveform', color: 'text-sky-400', action: 'voice', prompt: 'Ses tanıma motoru.' },
+      { id: 'tts', title: 'Metinden', sub: 'Ses Üretimi', icon: 'mic', color: 'text-purple-400', action: 'voice', prompt: 'Metinden ses üretimi motoru.' },
+      { id: 'ses_isleme', title: 'Ses', sub: 'İşleme', icon: 'sliders-horizontal', color: 'text-cyan-400', action: 'voice', prompt: 'Ses işleme motoru.' },
+      { id: 'belge', title: 'Belge & Dosya', sub: 'Analizi', icon: 'file-text', color: 'text-indigo-400', action: 'files', prompt: 'Belge ve dosya analizi motoru.' },
+      { id: 'otomasyon', title: 'Otomasyon', sub: '& İş Akışı', icon: 'share-2', color: 'text-sky-400', action: 'automation', prompt: 'Otomasyon ve iş akışı motoru.' }
+    ];
+
+    // -------------------------------------------------------------------------
+    // 2. APPLICATION STATE & LOCAL STORAGE
+    // -------------------------------------------------------------------------
+    let state = {
+      activeEngineId: 'genel',
+      preferredModel: 'auto',
+      autoSpeak: false,
+      memoryActive: true,
+      memories: [
+        'Kullanıcı adı: Barış Kömbe',
+        'Platform adı: BEK AI — Tüm yanıtlar doğal ve profesyonel Türkçe olmalıdır.'
+      ],
+      sessions: [
+        { id: 's-default', title: 'BEK AI Çalışma Oturumu', engineId: 'genel', messages: [] }
+      ],
+      activeSessionId: 's-default',
+      automations: [
+        { id: 'a1', title: 'Günlük Teknoloji Özeti', prompt: 'Bugün teknoloji ve yapay zekâ dünyasındaki en önemli 3 gelişmeyi özetle.' },
+        { id: 'a2', title: 'Kod İnceleme & İyileştirme', prompt: 'Modern web uygulamalarında performans ve güvenlik için kontrol listesi oluştur.' }
+      ],
+      stats: {
+        messages: 3200,
+        images: 148,
+        videos: 12,
+        audio: 36
+      },
+      attachedFile: null
+    };
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem('bek_ai_master_state');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          state = { ...state, ...parsed, attachedFile: null };
+        }
+      } catch (_) {}
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem('bek_ai_master_state', JSON.stringify({
+          activeEngineId: state.activeEngineId,
+          preferredModel: state.preferredModel,
+          autoSpeak: state.autoSpeak,
+          memoryActive: state.memoryActive,
+          memories: state.memories,
+          sessions: state.sessions,
+          activeSessionId: state.activeSessionId,
+          automations: state.automations,
+          stats: state.stats
+        }));
+      } catch (_) {}
+    }
+
+    // -------------------------------------------------------------------------
+    // 3. SILENT ZERO-CONFIG MULTI-AI FALLBACK ROUTER
+    //    (Switches providers seamlessly without showing errors to the user)
+    // -------------------------------------------------------------------------
+    async function executeSilentAI(userPrompt, options = {}) {
+      const { customSystem = '', history = [] } = options;
+      const engine = BEK_ENGINES.find(e => e.id === state.activeEngineId) || BEK_ENGINES[0];
+
+      let systemInstruction = customSystem || engine.prompt;
+      if (state.memoryActive && state.memories.length > 0) {
+        systemInstruction += `\n\n[Kişisel Hafıza Bağlamı]: ${state.memories.join(' | ')}`;
+      }
+
+      const messagesPayload = [
+        { role: 'system', content: systemInstruction },
+        ...history.slice(-6).map(m => ({ role: m.role, content: m.content })),
+        { role: 'user', content: userPrompt }
+      ];
+
+      // Order models based on right-panel selector, keeping full fallback chain
+      const puterOrder = state.preferredModel === 'claude'
+        ? ['claude-3-5-sonnet', 'gpt-4o-mini', 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo']
+        : state.preferredModel === 'llama'
+        ? ['meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'gpt-4o-mini', 'claude-3-5-sonnet']
+        : ['gpt-4o-mini', 'claude-3-5-sonnet', 'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo'];
+
+      // Layer 1: Puter.js Multi-Model Silent Pool
+      if (typeof puter !== 'undefined' && puter.ai && puter.ai.chat) {
+        for (const model of puterOrder) {
+          try {
+            const resp = await puter.ai.chat(messagesPayload, { model });
+            const txt = typeof resp === 'string' ? resp : (resp?.message?.content || resp?.text || '');
+            if (txt && txt.trim().length > 1) {
+              incrementUsage('messages');
+              return txt.trim();
+            }
+          } catch (_) {
+            // Silent fallback to next model
+          }
+        }
+      }
+
+      // Layer 2: Pollinations OpenAI-Compatible Multi-Model Pool
+      const pollinationsPool = state.preferredModel === 'qwen'
+        ? ['qwen-coder', 'openai', 'mistral', 'llama']
+        : ['openai', 'mistral', 'llama', 'qwen-coder'];
+
+      for (const pModel of pollinationsPool) {
+        try {
+          const res = await fetch('https://text.pollinations.ai/openai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              model: pModel,
+              messages: messagesPayload,
+              seed: Math.floor(Math.random() * 99999)
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const reply = data?.choices?.[0]?.message?.content;
+            if (reply && reply.trim().length > 1) {
+              incrementUsage('messages');
+              return reply.trim();
+            }
+          }
+        } catch (_) {
+          // Silent fallback
+        }
+      }
+
+      // Layer 3: Pollinations Direct GET Fallback
+      try {
+        const directUrl = `https://text.pollinations.ai/${encodeURIComponent((systemInstruction + '\n\n' + userPrompt).slice(0, 1700))}`;
+        const directRes = await fetch(directUrl);
+        if (directRes.ok) {
+          const rawTxt = await directRes.text();
+          if (rawTxt && rawTxt.trim().length > 1) {
+            incrementUsage('messages');
+            return rawTxt.trim();
+          }
+        }
+      } catch (_) {}
+
+      return 'İsteğiniz işlenirken kısa bir yoğunluk oluştu, lütfen mesajınızı tekrar gönderin.';
+    }
+
+    // -------------------------------------------------------------------------
+    // 4. NAVIGATION & ENGINE CARDS RENDERING
+    // -------------------------------------------------------------------------
+    function toggleLeftSidebar(forceOpen) {
+      const sb = document.getElementById('left-sidebar');
+      const ov = document.getElementById('mobile-overlay');
+      if (window.innerWidth < 1024) {
+        const open = typeof forceOpen === 'boolean' ? forceOpen : sb.classList.contains('-translate-x-full');
+        sb.classList.toggle('-translate-x-full', !open);
+        ov.classList.toggle('hidden', !open);
+      } else {
+        sb.classList.toggle('hidden');
+      }
+    }
+
+    function navigateTo(viewName) {
+      document.querySelectorAll('.view-pane').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`view-${viewName}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('sidebar-item-active');
+        if (btn.dataset.nav === viewName) btn.classList.add('sidebar-item-active');
+      });
+
+      if (window.innerWidth < 1024) toggleLeftSidebar(false);
+
+      if (viewName === 'chat') renderChatMessages();
+      if (viewName === 'history') renderHistoryList();
+      if (viewName === 'code') updateLiveSandbox();
+    }
+
+    function goHome() {
+      navigateTo('home');
+    }
+
+    function renderEngineGrids() {
+      const makeCardsHtml = () => BEK_ENGINES.map(eng => {
+        const isSelected = eng.id === state.activeEngineId;
+        return `
+          <button onclick="selectEngineCard('${eng.id}')" class="engine-card ${isSelected ? 'selected' : ''} p-3 rounded-2xl flex items-center gap-3 text-left group">
+            <div class="w-10 h-10 rounded-xl bg-white/[0.04] border border-white/[0.07] group-hover:border-sky-400/40 flex items-center justify-center ${eng.color} shrink-0 transition-colors">
+              <i data-lucide="${eng.icon}" class="w-5 h-5"></i>
+            </div>
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-white leading-tight truncate">${eng.title}</div>
+              <div class="text-[11px] text-slate-400 leading-tight mt-0.5 truncate">${eng.sub}</div>
+            </div>
+          </button>
+        `;
+      }).join('');
+
+      const homeGrid = document.getElementById('home-engines-grid');
+      const allGrid = document.getElementById('all-engines-grid');
+      if (homeGrid) homeGrid.innerHTML = makeCardsHtml();
+      if (allGrid) allGrid.innerHTML = makeCardsHtml();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    function selectEngineCard(engineId) {
+      const eng = BEK_ENGINES.find(e => e.id === engineId);
+      if (!eng) return;
+
+      state.activeEngineId = engineId;
+      saveState();
+      renderEngineGrids();
+
+      if (eng.action === 'image') {
+        navigateTo('image');
+        return;
+      }
+      if (eng.action === 'video') {
+        navigateTo('video');
+        return;
+      }
+      if (eng.action === 'voice') {
+        navigateTo('voice');
+        return;
+      }
+      if (eng.action === 'website' || eng.action === 'app') {
+        openBuilderPreset(eng.action);
+        return;
+      }
+      if (eng.action === 'files') {
+        navigateTo('files');
+        return;
+      }
+      if (eng.action === 'automation') {
+        navigateTo('automation');
+        return;
+      }
+
+      document.getElementById('chat-active-engine-badge').textContent = `${eng.title} ${eng.sub}`;
+      navigateTo('chat');
+      document.getElementById('chat-textarea')?.focus();
+    }
+
+    function openBuilderPreset(type) {
+      navigateTo('code');
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('sidebar-item-active'));
+      document.querySelector(`[data-nav="${type === 'website' ? 'website' : 'appbuilder'}"]`)?.classList.add('sidebar-item-active');
+      document.getElementById('builder-title').innerHTML = type === 'website'
+        ? `<i data-lucide="layout" class="w-5 h-5 text-indigo-400"></i><span>Web Sitesi Oluşturucu & Canlı Önizleme</span>`
+        : `<i data-lucide="smartphone" class="w-5 h-5 text-blue-400"></i><span>Uygulama Oluşturucu & Canlı Önizleme</span>`;
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    // -------------------------------------------------------------------------
+    // 5. CHAT WORKSPACE & HERO PROMPT SUBMISSION
+    // -------------------------------------------------------------------------
+    function getActiveSession() {
+      let s = state.sessions.find(x => x.id === state.activeSessionId);
+      if (!s) {
+        s = state.sessions[0];
+        state.activeSessionId = s.id;
+      }
+      return s;
+    }
+
+    function startFreshChat() {
+      const id = 's-' + Date.now();
+      state.sessions.unshift({
+        id,
+        title: 'Yeni Sohbet',
+        engineId: state.activeEngineId,
+        messages: []
+      });
+      state.activeSessionId = id;
+      saveState();
+      const eng = BEK_ENGINES.find(e => e.id === state.activeEngineId) || BEK_ENGINES[0];
+      document.getElementById('chat-active-engine-badge').textContent = `${eng.title} ${eng.sub}`;
+      navigateTo('chat');
+    }
+
+    async function handleHeroPromptSubmit(e) {
+      e.preventDefault();
+      const inp = document.getElementById('hero-prompt-input');
+      const text = inp.value.trim();
+      if (!text && !state.attachedFile) return;
+
+      inp.value = '';
+      startFreshChat();
+      await sendMessageToActiveChat(text || 'Ekli dosyayı analiz et.');
+    }
+
+    async function handleChatSubmit(e) {
+      e.preventDefault();
+      const ta = document.getElementById('chat-textarea');
+      const text = ta.value.trim();
+      if (!text && !state.attachedFile) return;
+
+      ta.value = '';
+      ta.style.height = 'auto';
+      await sendMessageToActiveChat(text || 'Ekli dosyayı analiz et.');
+    }
+
+    async function sendMessageToActiveChat(text) {
+      const session = getActiveSession();
+      const file = state.attachedFile;
+      clearAttachedFile();
+
+      if (session.messages.length === 0) {
+        session.title = text.slice(0, 32) + (text.length > 32 ? '...' : '');
+      }
+
+      session.messages.push({
+        role: 'user',
+        content: text,
+        fileName: file ? file.name : null
+      });
+      renderChatMessages();
+
+      // Add thinking indicator
+      const container = document.getElementById('chat-messages-container');
+      const loaderId = 'think-' + Date.now();
+      const loaderDiv = document.createElement('div');
+      loaderDiv.id = loaderId;
+      loaderDiv.className = 'flex items-center gap-3';
+      loaderDiv.innerHTML = `
+        <div class="w-8 h-8 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-xs font-bold text-purple-300">B</div>
+        <div class="flex items-center gap-1.5 px-4 py-3 rounded-2xl glass-panel">
+          <span class="w-2 h-2 rounded-full bg-purple-400 dot-pulse"></span>
+          <span class="w-2 h-2 rounded-full bg-sky-400 dot-pulse"></span>
+          <span class="w-2 h-2 rounded-full bg-purple-400 dot-pulse"></span>
+        </div>
+      `;
+      container.appendChild(loaderDiv);
+      scrollChatToBottom();
+
+      let fullQuery = text;
+      if (file && file.content) {
+        fullQuery += `\n\n[Dosya: ${file.name}]\n\`\`\`\n${file.content.slice(0, 12000)}\n\`\`\``;
+      }
+
+      const reply = await executeSilentAI(fullQuery, {
+        history: session.messages.slice(0, -1)
+      });
+
+      document.getElementById(loaderId)?.remove();
+
+      session.messages.push({
+        role: 'assistant',
+        content: reply
+      });
+      saveState();
+      renderChatMessages();
+
+      if (state.autoSpeak) speakText(reply);
+    }
+
+    function renderChatMessages() {
+      const container = document.getElementById('chat-messages-container');
+      const session = getActiveSession();
+      if (!container) return;
+
+      if (session.messages.length === 0) {
+        const eng = BEK_ENGINES.find(e => e.id === state.activeEngineId) || BEK_ENGINES[0];
+        container.innerHTML = `
+          <div class="py-16 text-center space-y-3">
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-purple-500/15 border border-purple-500/35 flex items-center justify-center text-purple-300">
+              <i data-lucide="${eng.icon}" class="w-6 h-6"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">BEK AI — ${eng.title} ${eng.sub}</h3>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">Aşağıdaki kutuya mesajını yazarak sohbete başlayabilirsin.</p>
+          </div>
+        `;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        return;
+      }
+
+      container.innerHTML = session.messages.map(m => {
+        if (m.role === 'user') {
+          return `
+            <div class="flex justify-end">
+              <div class="max-w-[85%] sm:max-w-xl rounded-2xl px-4 py-3 bg-purple-600/25 border border-purple-400/35 text-white text-sm leading-relaxed">
+                ${m.fileName ? `<div class="text-[11px] text-sky-300 mb-1">📎 ${esc(m.fileName)}</div>` : ''}
+                <div class="whitespace-pre-wrap">${esc(m.content)}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          return `
+            <div class="flex items-start gap-3">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500/25 to-purple-600/30 border border-purple-400/40 flex items-center justify-center text-xs font-extrabold text-sky-300 shrink-0 mt-0.5">
+                B
+              </div>
+              <div class="flex-1 min-w-0 glass-panel rounded-2xl p-4 space-y-2">
+                <div class="markdown-body">${renderMarkdownWithCopy(m.content)}</div>
+                <div class="flex items-center gap-3 pt-1.5 border-t border-white/[0.06] text-slate-400">
+                  <button onclick="copyRawText('${encodeURIComponent(m.content)}')" class="hover:text-sky-300 text-xs flex items-center gap-1">
+                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Kopyala
+                  </button>
+                  <button onclick="speakText(decodeURIComponent('${encodeURIComponent(m.content)}'))" class="hover:text-purple-300 text-xs flex items-center gap-1">
+                    <i data-lucide="volume-2" class="w-3.5 h-3.5"></i> Dinle
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }).join('');
+
+      container.querySelectorAll('.code-copy-btn').forEach(btn => {
+        btn.onclick = () => {
+          copyToClipboard(decodeURIComponent(btn.dataset.code));
+          btn.textContent = 'Kopyalandı';
+          setTimeout(() => btn.textContent = 'Kopyala', 1400);
+        };
+      });
+
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      scrollChatToBottom();
+    }
+
+    function renderMarkdownWithCopy(md) {
+      const html = marked.parse(md || '');
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      temp.querySelectorAll('pre').forEach(pre => {
+        const code = pre.querySelector('code')?.innerText || pre.innerText;
+        const bar = document.createElement('div');
+        bar.className = 'flex items-center justify-between px-3 py-1.5 bg-white/[0.04] border-b border-white/10 text-[11px] font-mono text-slate-400';
+        bar.innerHTML = `<span>Kod</span><button type="button" class="code-copy-btn hover:text-sky-300" data-code="${encodeURIComponent(code)}">Kopyala</button>`;
+        pre.insertBefore(bar, pre.firstChild);
+      });
+      return temp.innerHTML;
+    }
+
+    function scrollChatToBottom() {
+      const sc = document.getElementById('chat-scroll-area');
+      if (sc) sc.scrollTop = sc.scrollHeight;
+    }
+
+    function autoGrowInput(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 144) + 'px';
+    }
+
+    function handleTextareaEnter(e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleChatSubmit(e);
+      }
+    }
+
+    function renderHistoryList() {
+      const box = document.getElementById('history-list-container');
+      if (!box) return;
+      box.innerHTML = state.sessions.map(s => `
+        <div class="glass-panel p-3.5 rounded-2xl flex items-center justify-between hover:border-purple-400/40 cursor-pointer" onclick="openSavedSession('${s.id}')">
+          <div>
+            <div class="text-sm font-semibold text-white">${esc(s.title)}</div>
+            <div class="text-[11px] text-slate-400">${s.messages.length} mesaj</div>
+          </div>
+          ${state.sessions.length > 1 ? `<button onclick="event.stopPropagation(); deleteSavedSession('${s.id}')" class="text-xs text-slate-500 hover:text-rose-400 px-2">Sil</button>` : ''}
+        </div>
+      `).join('');
+    }
+
+    function openSavedSession(id) {
+      state.activeSessionId = id;
+      saveState();
+      navigateTo('chat');
+    }
+
+    function deleteSavedSession(id) {
+      state.sessions = state.sessions.filter(s => s.id !== id);
+      if (state.activeSessionId === id) state.activeSessionId = state.sessions[0].id;
+      saveState();
+      renderHistoryList();
+    }
+
+    // -------------------------------------------------------------------------
+    // 6. IMAGE STUDIO (SILENT FLUX -> TURBO -> SDXL FALLBACK)
+    // -------------------------------------------------------------------------
+    async function runImageStudio() {
+      const prompt = document.getElementById('img-studio-prompt').value.trim();
+      if (!prompt) {
+        showToast('Lütfen bir görsel açıklaması girin.');
+        return;
+      }
+
+      const size = document.getElementById('img-studio-size').value;
+      const style = document.getElementById('img-studio-style').value;
+      const [w, h] = size.split('x');
+      const canvas = document.getElementById('img-studio-canvas');
+      const btn = document.getElementById('img-studio-btn');
+
+      btn.disabled = true;
+      canvas.innerHTML = `<div class="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin mx-auto"></div><p class="text-xs text-purple-300 mt-3">Görsel oluşturuluyor...</p>`;
+
+      const engPrompt = await executeSilentAI(
+        `Translate this image description into concise English keywords for an AI image generator (max 25 words, ONLY output the English prompt): "${prompt}, ${style}"`,
+        { customSystem: 'Output ONLY the clean English prompt.' }
+      );
+
+      const clean = engPrompt.replace(/["']/g, '').trim();
+      const models = ['flux', 'turbo', 'sdxl'];
+      const seed = Math.floor(Math.random() * 999999);
+      let finalUrl = null;
+
+      for (const m of models) {
+        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(clean)}?width=${w}&height=${h}&model=${m}&seed=${seed}&nologo=true`;
+        const ok = await checkImgLoad(url, 15000);
+        if (ok) {
+          finalUrl = url;
+          break;
+        }
+      }
+
+      btn.disabled = false;
+      if (finalUrl) {
+        incrementUsage('images');
+        canvas.innerHTML = `
+          <div class="space-y-3 w-full">
+            <img src="${finalUrl}" alt="BEK AI Görsel" class="max-h-[400px] mx-auto rounded-xl border border-purple-500/35 shadow-2xl" />
+            <div>
+              <a href="${finalUrl}" target="_blank" download="bek-ai-gorsel.png" class="inline-block px-4 py-2 rounded-xl bg-purple-600 text-white text-xs font-semibold">Görseli İndir</a>
+            </div>
+          </div>
+        `;
+      } else {
+        canvas.innerHTML = `<p class="text-xs text-slate-400">Görsel servisi şu an yoğun, lütfen tekrar deneyin.</p>`;
+      }
+    }
+
+    function checkImgLoad(url, ms) {
+      return new Promise(resolve => {
+        const img = new Image();
+        const t = setTimeout(() => { img.src = ''; resolve(false); }, ms);
+        img.onload = () => { clearTimeout(t); resolve(true); };
+        img.onerror = () => { clearTimeout(t); resolve(false); };
+        img.src = url;
+      });
+    }
+
+    // -------------------------------------------------------------------------
+    // 7. VIDEO STUDIO (KEYFRAME VISUAL + TIMED SCENE SCRIPT)
+    // -------------------------------------------------------------------------
+    async function runVideoStudio() {
+      const prompt = document.getElementById('vid-studio-prompt').value.trim();
+      const dur = document.getElementById('vid-studio-dur').value;
+      if (!prompt) {
+        showToast('Lütfen video fikrinizi yazın.');
+        return;
+      }
+
+      const out = document.getElementById('vid-studio-output');
+      const btn = document.getElementById('vid-studio-btn');
+      btn.disabled = true;
+      out.innerHTML = `<p class="text-xs text-purple-300 animate-pulse">Video sahnesi ve anahtar kare hazırlanıyor...</p>`;
+
+      const [script, engFrame] = await Promise.all([
+        executeSilentAI(`Konu: "${prompt}", Süre: ${dur}. Saniye saniye video çekim senaryosu, kamera hareketleri ve seslendirme metni oluştur.`),
+        executeSilentAI(`Convert to 15-word English cinematic frame description: "${prompt}"`, { customSystem: 'Output ONLY English visual keywords.' })
+      ]);
+
+      const frameUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(engFrame.replace(/["']/g, ''))}?width=1280&height=720&model=flux&nologo=true`;
+      incrementUsage('videos');
+
+      out.innerHTML = `
+        <div class="space-y-4">
+          <div class="rounded-xl overflow-hidden border border-purple-500/30 relative">
+            <img src="${frameUrl}" alt="Sahne Önizleme" class="w-full max-h-64 object-cover" />
+            <span class="absolute bottom-2 left-2 px-2.5 py-1 rounded-lg bg-black/75 text-[11px] text-sky-300">Anahtar Sahne Karesi • ${dur}</span>
+          </div>
+          <div class="markdown-body">${marked.parse(script)}</div>
+        </div>
+      `;
+      btn.disabled = false;
+    }
+
+    // -------------------------------------------------------------------------
+    // 8. LIVE CODE / WEBSITE / APP BUILDER
+    // -------------------------------------------------------------------------
+    function updateLiveSandbox() {
+      const code = document.getElementById('code-editor-area')?.value || '';
+      const iframe = document.getElementById('sandbox-iframe');
+      if (iframe) iframe.srcdoc = code;
+    }
+
+    async function generateLiveProject() {
+      const prompt = document.getElementById('builder-prompt-input').value.trim();
+      if (!prompt) {
+        showToast('Lütfen proje açıklamasını girin.');
+        return;
+      }
+
+      const btn = document.getElementById('builder-run-btn');
+      btn.disabled = true;
+      btn.textContent = 'Üretiliyor...';
+
+      const code = await executeSilentAI(
+        `Aşağıdaki isteğe göre tek dosya halinde çalışan, modern ve responsive eksiksiz bir HTML5 uygulaması yaz. SADECE saf HTML kodunu döndür:\n\n${prompt}`,
+        { customSystem: 'Return ONLY standalone valid HTML5 code starting with <!DOCTYPE html>. No markdown fences.' }
+      );
+
+      let clean = code.replace(/^```html\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
+      const idx = clean.indexOf('<!DOCTYPE html');
+      if (idx > 0) clean = clean.slice(idx);
+
+      document.getElementById('code-editor-area').value = clean;
+      updateLiveSandbox();
+      btn.disabled = false;
+      btn.textContent = 'Oluştur & Çalıştır';
+      showToast('Proje oluşturuldu.');
+    }
+
+    function copyEditorCode() {
+      copyToClipboard(document.getElementById('code-editor-area').value);
+      showToast('Kod kopyalandı.');
+    }
+
+    function exportSingleHtml() {
+      const blob = new Blob([document.getElementById('code-editor-area').value], { type: 'text/html;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bek-ai-proje.html';
+      a.click();
+    }
+
+    async function exportProjectZip() {
+      const zip = new JSZip();
+      zip.file('index.html', document.getElementById('code-editor-area').value);
+      zip.file('README.md', '# BEK AI Projesi');
+      const blob = await zip.generateAsync({ type: 'blob' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'bek-ai-proje.zip';
+      a.click();
+      showToast('ZIP paketi indirildi.');
+    }
+
+    // -------------------------------------------------------------------------
+    // 9. VOICE STUDIO, PROMPT STUDIO, RESEARCH, FILES, MEMORY, AUTOMATIONS
+    // -------------------------------------------------------------------------
+    let recognition = null;
+    let isRecording = false;
+
+    function startVoiceInput(targetId) {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) {
+        showToast('Tarayıcı ses girişini desteklemiyor.');
+        return;
+      }
+      const rec = new SR();
+      rec.lang = 'tr-TR';
+      showToast('Dinleniyor...');
+      rec.onresult = (e) => {
+        const el = document.getElementById(targetId);
+        if (el) el.value = (el.value ? el.value + ' ' : '') + e.results[0][0].transcript;
+      };
+      rec.start();
+    }
+
+    function toggleVoiceDictation() {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) return;
+      const btn = document.getElementById('voice-rec-btn');
+      const circle = document.getElementById('voice-mic-circle');
+      const out = document.getElementById('voice-stt-text');
+
+      if (isRecording && recognition) {
+        recognition.stop();
+        isRecording = false;
+        btn.textContent = 'Mikrofonu Başlat';
+        circle.classList.remove('animate-pulse');
+        return;
+      }
+
+      recognition = new SR();
+      recognition.lang = 'tr-TR';
+      isRecording = true;
+      btn.textContent = 'Durdur';
+      circle.classList.add('animate-pulse');
+
+      recognition.onresult = (e) => {
+        out.value = (out.value ? out.value + ' ' : '') + e.results[0][0].transcript;
+      };
+      recognition.onend = () => {
+        isRecording = false;
+        btn.textContent = 'Mikrofonu Başlat';
+        circle.classList.remove('animate-pulse');
+      };
+      recognition.start();
+    }
+
+    function speakText(txt) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance((txt || '').replace(/[#*`]/g, ''));
+      u.lang = 'tr-TR';
+      incrementUsage('audio');
+      window.speechSynthesis.speak(u);
+    }
+
+    function toggleAutoSpeak() {
+      state.autoSpeak = !state.autoSpeak;
+      saveState();
+      const btn = document.getElementById('tts-toggle-btn');
+      btn.innerHTML = state.autoSpeak
+        ? '<i data-lucide="volume-2" class="w-4 h-4 text-purple-400"></i>'
+        : '<i data-lucide="volume-x" class="w-4 h-4"></i>';
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+
+    async function optimizeUserPrompt() {
+      const raw = document.getElementById('raw-idea-input').value.trim();
+      if (!raw) return;
+      const box = document.getElementById('opt-prompt-result');
+      box.classList.remove('hidden');
+      box.innerHTML = '<p class="text-xs text-purple-300">Prompt optimize ediliyor...</p>';
+      const res = await executeSilentAI(`Şu fikri yapay zekâ için en yüksek kalitede, detaylı ve profesyonel bir prompta dönüştür:\n\n${raw}`);
+      box.innerHTML = marked.parse(res);
+    }
+
+    async function runResearchQuery() {
+      const q = document.getElementById('research-query-input').value.trim();
+      if (!q) return;
+      const box = document.getElementById('research-output-box');
+      box.innerHTML = '<p class="text-xs text-sky-300">Araştırma raporu hazırlanıyor...</p>';
+      const res = await executeSilentAI(`Şu konuyu derinlemesine araştır ve başlıklar halinde kapsamlı analiz raporu yaz:\n\n${q}`);
+      box.innerHTML = marked.parse(res);
+    }
+
+    function handleFileAttachment(e) {
+      const f = e.target.files[0];
+      if (!f) return;
+      const r = new FileReader();
+      r.onload = (ev) => {
+        state.attachedFile = {
+          name: f.name,
+          content: f.type.startsWith('image/') ? `[Görsel: ${f.name}]` : ev.target.result
+        };
+        document.getElementById('home-file-name').textContent = f.name;
+        document.getElementById('home-file-chip').classList.remove('hidden');
+        document.getElementById('chat-file-name').textContent = f.name;
+        document.getElementById('chat-file-chip').classList.remove('hidden');
+      };
+      if (f.type.startsWith('image/')) r.readAsDataURL(f);
+      else r.readAsText(f);
+    }
+
+    function clearAttachedFile() {
+      state.attachedFile = null;
+      document.getElementById('home-file-chip')?.classList.add('hidden');
+      document.getElementById('chat-file-chip')?.classList.add('hidden');
+    }
+
+    function analyzeUploadedFile(e) {
+      const f = e.target.files[0];
+      if (!f) return;
+      const panel = document.getElementById('file-analysis-panel');
+      panel.classList.remove('hidden');
+      panel.innerHTML = '<p class="text-xs text-purple-300">Dosya analiz ediliyor...</p>';
+      const r = new FileReader();
+      r.onload = async (ev) => {
+        const prompt = f.type.startsWith('image/')
+          ? `"${f.name}" adlı görsel dosyasını teknik açıdan değerlendir.`
+          : `"${f.name}" dosyasını özetle ve önemli noktaları çıkar:\n\n${ev.target.result.slice(0, 14000)}`;
+        const ans = await executeSilentAI(prompt);
+        panel.innerHTML = marked.parse(ans);
+      };
+      if (f.type.startsWith('image/')) r.readAsDataURL(f);
+      else r.readAsText(f);
+    }
+
+    function renderMemoryEntries() {
+      const list = document.getElementById('memory-entries-list');
+      const chk = document.getElementById('memory-enabled-chk');
+      if (chk) chk.checked = state.memoryActive;
+      if (!list) return;
+      list.innerHTML = state.memories.map((m, i) => `
+        <div class="glass-panel px-4 py-3 rounded-xl flex items-center justify-between text-xs text-slate-200">
+          <span>${esc(m)}</span>
+          <button onclick="removeMemoryEntry(${i})" class="text-slate-500 hover:text-rose-400">Sil</button>
+        </div>
+      `).join('');
+    }
+
+    function addMemoryEntry(e) {
+      e.preventDefault();
+      const inp = document.getElementById('memory-entry-input');
+      if (!inp.value.trim()) return;
+      state.memories.push(inp.value.trim());
+      inp.value = '';
+      saveState();
+      renderMemoryEntries();
+    }
+
+    function removeMemoryEntry(i) {
+      state.memories.splice(i, 1);
+      saveState();
+      renderMemoryEntries();
+    }
+
+    function toggleMemoryEnabled(val) {
+      state.memoryActive = val;
+      saveState();
+    }
+
+    function renderAutomations() {
+      const grid = document.getElementById('automation-cards-grid');
+      if (!grid) return;
+      grid.innerHTML = state.automations.map(a => `
+        <div class="glass-panel p-4 rounded-2xl space-y-2.5">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-purple-400">⚡ Otomasyon</span>
+            <button onclick="removeAutomation('${a.id}')" class="text-xs text-slate-500 hover:text-rose-400">Sil</button>
+          </div>
+          <div class="text-sm font-bold text-white">${esc(a.title)}</div>
+          <p class="text-xs text-slate-400">${esc(a.prompt)}</p>
+          <button onclick="triggerAutomation('${a.id}')" class="w-full py-2 rounded-xl bg-purple-600/25 hover:bg-purple-600/35 border border-purple-500/35 text-xs font-semibold text-purple-200">Çalıştır</button>
+        </div>
+      `).join('');
+    }
+
+    function addAutomationTask(e) {
+      e.preventDefault();
+      const t = document.getElementById('auto-task-title').value.trim();
+      const p = document.getElementById('auto-task-prompt').value.trim();
+      if (!t || !p) return;
+      state.automations.unshift({ id: 'a-' + Date.now(), title: t, prompt: p });
+      document.getElementById('auto-task-title').value = '';
+      document.getElementById('auto-task-prompt').value = '';
+      saveState();
+      renderAutomations();
+    }
+
+    function removeAutomation(id) {
+      state.automations = state.automations.filter(x => x.id !== id);
+      saveState();
+      renderAutomations();
+    }
+
+    function triggerAutomation(id) {
+      const a = state.automations.find(x => x.id === id);
+      if (!a) return;
+      startFreshChat();
+      sendMessageToActiveChat(a.prompt);
+    }
+
+    // -------------------------------------------------------------------------
+    // 10. RIGHT PANEL USAGE & MODEL SELECTOR
+    // -------------------------------------------------------------------------
+    function onModelSelectionChange(val) {
+      state.preferredModel = val;
+      saveState();
+    }
+
+    function incrementUsage(type) {
+      if (state.stats[type] !== undefined) {
+        state.stats[type] += 1;
+        saveState();
+        renderUsageStats();
+      }
+    }
+
+    function renderUsageStats() {
+      const pct = Math.min(100, Math.round((state.stats.messages / 10000) * 100));
+      document.getElementById('quota-percent-label').textContent = `%${pct}`;
+      document.getElementById('quota-progress-bar').style.width = `${pct}%`;
+      document.getElementById('stat-msg-count').textContent = `${state.stats.messages.toLocaleString('tr-TR')} / 10.000`;
+      document.getElementById('stat-img-count').textContent = `${state.stats.images} / 500`;
+      document.getElementById('stat-vid-count').textContent = `${state.stats.videos} / 50`;
+      document.getElementById('stat-aud-count').textContent = `${state.stats.audio} / 200`;
+    }
+
+    function resetAllLocalData() {
+      localStorage.removeItem('bek_ai_master_state');
+      location.reload();
+    }
+
+    // -------------------------------------------------------------------------
+    // 11. UTILITIES & INIT
+    // -------------------------------------------------------------------------
+    function esc(s) {
+      return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    function copyToClipboard(txt) {
+      const ta = document.createElement('textarea');
+      ta.value = txt;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+
+    function copyRawText(enc) {
+      copyToClipboard(decodeURIComponent(enc));
+      showToast('Kopyalandı.');
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toast-box');
+      const div = document.createElement('div');
+      div.className = 'pointer-events-auto px-3.5 py-2 rounded-xl bg-[#14182e] border border-purple-500/40 text-xs text-white shadow-xl';
+      div.textContent = msg;
+      box.appendChild(div);
+      setTimeout(() => div.remove(), 2400);
+    }
+
+    window.onload = function() {
+      loadState();
+      document.getElementById('right-model-selector').value = state.preferredModel;
+      renderEngineGrids();
+      renderUsageStats();
+      renderMemoryEntries();
+      renderAutomations();
+      updateLiveSandbox();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+    };
+  </script>
+</body>
+</html>
