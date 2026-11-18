@@ -43,7 +43,7 @@ Supabase normally supplies its own URL/key environment values to Edge Functions;
 supabase functions deploy ai-chat
 ```
 
-The Edge Function validates the signed-in user, reserves up to 20 messages per UTC day, and calls OpenRouter server-side. Model routing uses OpenRouter Auto; actual model availability, free-tier eligibility, rate limits, and response quality are determined by OpenRouter and upstream providers.
+The Edge Function validates the signed-in user, reserves up to 20 messages per UTC day, and calls OpenRouter server-side. Model routing uses OpenRouter's free-model router; actual free model availability, quotas, rate limits, context size, and response quality are determined by OpenRouter and upstream providers. No unlimited usage is promised.
 
 ## 5. Configure email sign-in
 
