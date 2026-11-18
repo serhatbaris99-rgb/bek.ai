@@ -11,7 +11,7 @@ async function askAI(messages,system='Sen BEK AI adlı yardımcı, dikkatli ve y
  if(!supabaseClient)throw new Error('Supabase ayarı eksik. config.js dosyasına proje URL ve anon public key girilmeli.');
  const {data:{session}}=await supabaseClient.auth.getSession();
  if(!session)throw new Error('AI kullanmak için önce Hesabım / Giriş bölümünden e-posta ile giriş yap.');
- const response=await fetch(publicConfig.SUPABASE_URL+'/functions/v1/ai-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':publicConfig.SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify({messages:[{role:'system',content:system},...messages]})});
+ const response=await fetch(publicConfig.SUPABASE_URL+'/functions/v1/ai-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':publicConfig.SUPABASE_ANON_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify({messages:messages.filter(m=>m.role==='user'||m.role==='assistant').map((m,i)=>i===0&&m.role==='user'?{...m,content:'Talimat: '+system+'\\n\\n'+m.content}:m)})});
  const data=await response.json().catch(()=>({}));
  if(!response.ok)throw new Error(data.error||'AI sunucusundan yanıt alınamadı.');
  return data.answer;
