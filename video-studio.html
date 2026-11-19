@@ -84,5 +84,7 @@ async function runGeneration(testMode=false){
  }catch(err){const code=err.code||err.errorCode||'';status.textContent='Üretim başarısız: '+(err.message||String(err))+(code?' ('+code+')':'')+' — Ücret yalnızca başarılı üretimlerde alınır.'}
  finally{btn.disabled=false}
 };
+document.getElementById('generate').onclick=()=>runGeneration(false);
+document.getElementById('testGenerate').onclick=()=>runGeneration(true);
 renderChars();
 </script></body></html>
