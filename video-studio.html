@@ -15,7 +15,7 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.wrap{max-width:
 <body><div class="wrap">
 <header class="top"><div class="brand"><div class="logo">B</div><div>BEK AI <div class="sub">VIDEO STUDIO · REFERANS KARAKTER</div></div></div><div class="status" id="connection">● Üretim motoru bağlanmadı</div></header>
 <section class="hero"><h1>Fikrini hareketli sahneye dönüştür.</h1><p>Fotoğrafını canlandır veya bir karakter oluşturup onu farklı sahnelerde tutarlı biçimde kullan. Gerçek video üretimi yalnızca bağlı bir video motoruyla çalışır.</p></section>
-<div class="notice good">Gerçek video motoru Puter.js ile bağlandı. İlk kullanımda Puter hesabı ile oturum açman gerekebilir. Her başarılı üretim AI bakiyesinden ücretlendirilir; sınırsız veya ücretsiz değildir.</div>
+<div class="notice good">Puter.js video API entegrasyonu hazır. İlk üretimde Puter oturumu açılır; üretim sağlayıcısının ücretleri kullanıcı bakiyesinden düşer. Ücretsiz deneme için önce “Ücretsiz test” düğmesini kullan.</div>
 <div class="tabs"><button class="tab active" data-mode="animate">Fotoğrafı canlandır</button><button class="tab" data-mode="character">Karakterle yeni sahne</button></div>
 <div class="grid">
 <section class="card">
@@ -33,21 +33,21 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.wrap{max-width:
 <div class="field" style="margin-top:17px"><label>Kayıtlı karakterler</label><div class="charlist" id="charList"><span class="muted">Henüz karakter kaydedilmedi.</span></div></div>
 </div>
 <div class="field"><label for="scene">Sahne / hareket talimatı</label><textarea id="scene" placeholder="Örn. Yağmurlu bir Tokyo sokağında gece yürüsün, kamera yandan takip etsin..."></textarea></div>
-<div class="row"><div class="field"><label for="ratio">En-boy oranı</label><select id="ratio"><option value="9:16">9:16 · Shorts / Reels</option><option value="16:9">16:9 · YouTube</option><option value="1:1">1:1 · Kare</option></select></div><div class="field"><label for="duration">Hedef süre</label><select id="duration"><option value="5">5 saniye</option><option value="10" selected>10 saniye</option><option value="15">15 saniye</option><option value="30">15 saniye</option></select></div></div>
+<div class="row"><div class="field"><label for="ratio">En-boy oranı</label><select id="ratio"><option value="9:16">9:16 · Shorts / Reels</option><option value="16:9">16:9 · YouTube</option><option value="1:1">1:1 · Kare</option></select></div><div class="field"><label for="duration">Hedef süre</label><select id="duration"><option value="5">5 saniye</option><option value="8">8 saniye</option><option value="10" selected>10 saniye</option><option value="15">15 saniye</option></select></div></div>
 <div class="row"><button class="btn" id="prepare">Üretim istemini hazırla</button><button class="btn ghost" id="copy" disabled>İstemi kopyala</button></div>
 </section>
 <aside class="card">
 <h2>2 · Üretim ve çıktı</h2>
 <div class="notice good">Video motoru: Puter.js · Hazır</div>
 <div class="field"><label>Hazırlanan üretim istemi</label><div class="out" id="promptOutput">Henüz istem hazırlanmadı.</div></div>
-<button class="btn" id="generate" style="width:100%">✦ Gerçek yapay zekâ videosu üret</button><div id="videoStatus" class="muted" style="font-size:12px;line-height:1.6;margin-top:12px" role="status"></div><div id="videoResult" style="margin-top:12px"></div>
+<div class="row"><button class="btn secondary" id="testGenerate" style="flex:1">Ücretsiz test</button><button class="btn" id="generate" style="flex:1">✦ Gerçek video üret</button></div><div id="videoStatus" class="muted" style="font-size:12px;line-height:1.6;margin-top:12px" role="status"></div><div id="videoResult" style="margin-top:12px"></div>
 <p class="muted" style="font-size:12px;line-height:1.6;margin-top:13px">Karakter fotoğrafları bu tarayıcıdaki yerel depoda tutulur. Tarayıcı verilerini temizlersen kayıtlar silinebilir. Hassas veya başkasına ait fotoğrafları izinsiz yükleme.</p>
 </aside>
 </div>
 <div class="footer">BEK AI Video Studio · Image-to-video ve karakter referanslı video üretimi · Puter.js</div>
 </div>
 <script>
-const DB='bek-video-studio', STORE='characters'; let mode='animate', selectedCharacter=null, currentPrompt='';
+const DB='bek-video-studio', STORE='characters'; let mode='animate', selectedCharacter=null, currentPrompt='';\nconst connection=document.getElementById('connection');\nfunction setConnection(){const ok=!!(window.puter&&puter.ai&&typeof puter.ai.txt2vid==='function');connection.textContent=ok?'● Video API hazır':'● SDK yükleniyor';connection.style.borderColor=ok?'#235f52':'#755c31';connection.style.background=ok?'#102720':'#322716';connection.style.color=ok?'#b7f7df':'#ffd99b';}\nsetConnection();window.addEventListener('load',setConnection);
 function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE,{keyPath:'id',autoIncrement:true});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 async function dbop(action,value){const db=await openDB();return new Promise((res,rej)=>{const tx=db.transaction(STORE,'readwrite'),s=tx.objectStore(STORE);let r=action==='all'?s.getAll():action==='add'?s.add(value):s.delete(value);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
 function preview(input,img){input.addEventListener('change',()=>{const f=input.files[0];if(!f)return;if(!f.type.startsWith('image/'))return alert('Lütfen görsel dosyası seç.');const u=URL.createObjectURL(f);img.src=u;img.classList.remove('hidden')})}
@@ -60,7 +60,7 @@ document.getElementById('prepare').onclick=makePrompt;document.getElementById('c
 async function readImageAsDataURL(file){return new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(r.result);r.onerror=reject;r.readAsDataURL(file)})}
 document.getElementById('generate').onclick=async()=>{
  const btn=document.getElementById('generate'),status=document.getElementById('videoStatus'),result=document.getElementById('videoResult');
- const scene=document.getElementById('scene').value.trim(),duration=Math.min(15,Number(document.getElementById('duration').value)||5),ratio=document.getElementById('ratio').value;
+ const scene=document.getElementById('scene').value.trim(),duration=Number(document.getElementById('duration').value)||5,ratio=document.getElementById('ratio').value;
  if(!scene){status.textContent='Önce sahne / hareket talimatını yaz.';return}
  if(!window.puter||!puter.ai||!puter.ai.txt2vid){status.textContent='Video motoru yüklenemedi. Sayfayı yenile.';return}
  try{
@@ -71,17 +71,17 @@ document.getElementById('generate').onclick=async()=>{
    if(file.size>20*1024*1024){status.textContent='Fotoğraf 20 MB sınırını aşıyor.';return}
    const ref=await readImageAsDataURL(file),dims=ratio==='9:16'?[720,1280]:ratio==='1:1'?[720,720]:[1280,720];
    prompt='Animate the uploaded reference image as the first frame. Preserve exact identity, face, hairstyle, clothing and proportions. Natural motion, coherent anatomy, stable scene, cinematic camera movement. '+(document.getElementById('motion').value.trim()||scene)+'. Scene: '+scene+'. No identity drift, flicker, extra limbs, text or watermark.';
-   options={model:'togetherai:wan-ai/wan2.7-i2v',seconds:duration,size:'1080P',width:dims[0],height:dims[1],input_reference:ref,generate_audio:true};
+   options={model:'togetherai:wan-ai/wan2.7-i2v',seconds:duration,size:'720P',width:dims[0],height:dims[1],input_reference:file,generate_audio:true,puter_output_path:'videos/bek-'+Date.now()+'.mp4'};
   }else{
    if(!selectedCharacter){status.textContent='Önce kayıtlı karakterlerden birini seç.';return}
    prompt='Use the supplied reference image to preserve the same character identity in this new scene. Keep the same face, hairstyle, clothing, body proportions and defining details. Do not redesign the character. Cinematic natural motion, coherent anatomy, stable details. Scene: '+scene+'. No identity drift, flicker, extra limbs, text or watermark. Character notes: '+(selectedCharacter.desc||'Preserve the uploaded character appearance.');
-   options={model:'seedance-2-5',seconds:Math.min(10,duration),size:'1080p',reference_images:[selectedCharacter.photo],generate_audio:true};
+   options={model:'seedance-2-5',seconds:Math.min(15,Math.max(4,duration)),size:'720p',width:ratio==='9:16'?720:ratio==='1:1'?720:1280,height:ratio==='9:16'?1280:ratio==='1:1'?720:720,reference_images:[selectedCharacter.photo],generate_audio:true,puter_output_path:'videos/bek-'+Date.now()+'.mp4'};
   }
   status.textContent='Yapay zekâ videoyu oluşturuyor. Sekmeyi kapatma; birkaç dakika sürebilir…';
   const video=await puter.ai.txt2vid(prompt,options);video.controls=true;video.playsInline=true;video.style.width='100%';video.style.borderRadius='12px';video.style.maxHeight='520px';
   result.append(video);const link=document.createElement('a');link.href=video.src;link.target='_blank';link.rel='noopener';link.textContent='Videoyu aç / kaydet';link.style.display='inline-block';link.style.marginTop='10px';link.style.color='#a5d8ff';result.append(link);
-  status.textContent='Video oluşturuldu. Sağlayıcı bağlantıları geçici olabilir; videoyu cihazına kaydet.';
- }catch(err){status.textContent='Üretim başarısız: '+(err.message||String(err))+(err.code?' ('+err.code+')':'')}
+  status.textContent='Video oluşturuldu ve Puter dosyalarına kaydedilmesi istendi. Sağlayıcı önizleme bağlantısı geçici olabilir; aşağıdaki bağlantıdan videoyu hemen cihazına kaydet.';
+ }catch(err){const code=err.code||err.errorCode||'';status.textContent='Üretim başarısız: '+(err.message||String(err))+(code?' ('+code+')':'')+' — Ücret yalnızca başarılı üretimlerde alınır.'}
  finally{btn.disabled=false}
 };
 renderChars();
